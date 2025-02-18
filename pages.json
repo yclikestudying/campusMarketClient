@@ -1,0 +1,308 @@
+{
+	"pages": [{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"animationType": "slide-in-right", // 全局配置跳转动画
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/tabbar/home/home",
+			"style": {
+				"navigationBarTitleText": "主页",
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/tabbar/share/share",
+			"style": {
+				"navigationBarTitleText": "动态",
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/tabbar/message/message",
+			"style": {
+				"navigationBarTitleText": "消息",
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/tabbar/my/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"app-plus": {
+					"scrollIndicator": "none",
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/home/schoolShare/schoolShare",
+			"style": {
+				"navigationBarTitleText": "动态分享",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/home/goodsMarket/goodsMarket",
+			"style": {
+				"navigationBarTitleText": "二手集市",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/home/express/express",
+			"style": {
+				"navigationBarTitleText": "快递代取",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/home/search/search",
+			"style": {
+				"navigationBarTitleText": "搜索页面",
+				"animationType": "slide-in-bottom",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/my/myIndex/myIndex",
+			"style": {
+				"navigationBarTitleText": "我的主页",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"type": "transparent",
+						"backgroundColor": "#ffffff",
+						"buttons": [{
+							"type": "menu"
+						}]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/my/info/info",
+			"style": {
+				"navigationBarTitleText": "资料展示",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff",
+						"titleText": "编辑资料"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/info/username/username",
+			"style": {
+				"navigationBarTitleText": "用户名",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/info/birthday/birthday",
+			"style": {
+				"navigationBarTitleText": "出生日期",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/info/profile/profile",
+			"style": {
+				"navigationBarTitleText": "简介",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/info/location/location",
+			"style": {
+				"navigationBarTitleText": "所在地",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/info/homeTown/homeTown",
+			"style": {
+				"navigationBarTitleText": "家乡",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/info/profession/profession",
+			"style" : 
+			{
+				"navigationBarTitleText" : "职业",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/info/tag/tag",
+			"style" : 
+			{
+				"navigationBarTitleText" : "标签",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/info/gender/gender",
+			"style" : 
+			{
+				"navigationBarTitleText" : "性别",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {},
+	"tabBar": {
+		"selectedColor": "#FEE802",
+		"list": [{
+				"pagePath": "pages/tabbar/home/home",
+				"iconPath": "/static/tabbar/主页.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/tabbar/share/share",
+				"iconPath": "/static/tabbar/动态.png",
+				"text": "动态"
+			},
+			{
+				"pagePath": "pages/tabbar/message/message",
+				"iconPath": "/static/tabbar/消息.png",
+				"text": "消息"
+			},
+			{
+				"pagePath": "pages/tabbar/my/my",
+				"iconPath": "/static/tabbar/我的.png",
+				"text": "我的"
+			}
+		]
+	}
+}
