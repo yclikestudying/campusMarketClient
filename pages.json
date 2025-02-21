@@ -52,6 +52,7 @@
 			"style": {
 				"navigationBarTitleText": "我的",
 				"app-plus": {
+					"bounce": "none",
 					"scrollIndicator": "none",
 					"titleNView": false
 				}
@@ -268,6 +269,55 @@
 					"bounce": "none",
 					"scrollIndicator": "none",
 					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/my/friend/friend",
+			"style" : 
+			{
+				"navigationBarTitleText" : "好友",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/message/chat/chat",
+			"style" : 
+			{
+				"navigationBarTitleText" : "聊天页面",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/my/setting/setting",
+			"style" : 
+			{
+				"navigationBarTitleText" : "设置页面",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"titleText": "更多设置",
 						"backgroundColor": "#ffffff"
 					}
 				}

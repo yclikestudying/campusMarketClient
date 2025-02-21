@@ -4,12 +4,12 @@ let currentTime = null
  * 计算用户信息的完善情况
  */
 export const userInfoProgress = () => {
-	const userInfo = uni.getStorageSync("userInfo")
-	const totle = Object.keys(userInfo).length - 2;
+	const user = uni.getStorageSync("user")
+	const totle = Object.keys(user).length - 2;
 	let count = 0;
-	for (let item in userInfo) {
+	for (let item in user) {
 		if (
-			!userInfo[`${item}`] &&
+			!user[`${item}`] &&
 			item !== "userAvatar" &&
 			item !== "createTime"
 		) {

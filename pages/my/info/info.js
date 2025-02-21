@@ -5,6 +5,7 @@ import { ref } from "vue";
  */
 export let role = ref('') // 用户角色
 export let permission = ref('') // 用户权限
+export let user = ref(null); // 用户信息
 
 
 /**

@@ -574,7 +574,7 @@ uni-image[data-v-fc8ca2d6] {
 					height: 100%;
 					display: flex;
 					align-items: center;
-					justify-content: center;
+					justify-content: right;
 }
 }
 .name[data-v-fc8ca2d6] {
@@ -584,6 +584,16 @@ uni-image[data-v-fc8ca2d6] {
 				font-weight: bold;
 				display: flex;
 				align-items: center;
+.image[data-v-fc8ca2d6] {
+					width: 50px;
+					height: 100%;
+					display: flex;
+					align-items: center;
+uni-image[data-v-fc8ca2d6] {
+						width: 50px;
+						height: 20px;
+}
+}
 }
 .data[data-v-fc8ca2d6] {
 				width: 90%;
@@ -608,6 +618,11 @@ uni-text[data-v-fc8ca2d6]:nth-child(2) {
 				width: 90%;
 				font-size: 12px;
 				color: gray;
+				display: flex;
+				flex-wrap: wrap;
+.tag-item[data-v-fc8ca2d6] {
+					margin-right: 2px;
+}
 }
 .date[data-v-fc8ca2d6] {
 				padding: 5px 0;

@@ -128,6 +128,14 @@
 		fabClick,
 		trigger
 	} from './home.js';
+	import {
+		onShow,
+		onLoad
+	} from "@dcloudio/uni-app"
+	
+	onLoad((e) => {
+		console.log('哈哈哈')
+	})
 </script>
 
 <style lang="less" scoped>

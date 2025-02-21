@@ -19,8 +19,8 @@
 				<swiper-item>
 					<view class="swiper-item">
 						<scroll-view scroll-y="true" class="userList">
-							<template v-for="item in 20">
-								<uni-list-chat title="uni-app"
+							<template v-for="item in 2">
+								<uni-list-chat title="uni-app" clickable @click="toOtherPage('chat')"
 									avatar="https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png"
 									note="您收到一条新的消息" time="2020-02-02 20:20" badge-text="12"></uni-list-chat>
 							</template>
@@ -43,7 +43,8 @@
 	import {
 		currentOption,
 		setCurrentOption,
-		onSwiperChange
+		onSwiperChange,
+		toOtherPage
 	} from "./message.js"
 </script>
 

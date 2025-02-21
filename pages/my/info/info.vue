@@ -2,32 +2,34 @@
 	<scroll-view scroll-y="true" class="info">
 		<scroll-view class="scrollView" scroll-y="true">
 			<view @click="toOtherPage('username')">
-				<van-cell title="用户名" :is-link="permission === 'update'" size="large" />
+				<van-cell title="用户名" :value="user.userName || ''" :is-link="permission === 'update'" size="large" />
 			</view>
 			<view @click="toOtherPage('gender')">
-				<van-cell title="性别" :is-link="permission === 'update'" size="large" />
+				<van-cell title="性别" :value="user.userGender === 1 ? '男' : user.userGender === 0 ? '女' : '保密'" :is-link="permission === 'update'" size="large" />
 			</view>
 			<view @click="toOtherPage('birthday')">
-				<van-cell title="生日" :is-link="permission === 'update'" size="large" />
+				<van-cell title="生日" :value="user.userBirthday || ''" :is-link="permission === 'update'" size="large" />
 			</view>
 			<view @click="toOtherPage('profile')">
-				<van-cell title="简介" :is-link="permission === 'update'" size="large" />
+				<van-cell title="简介" :value="user.userProfile || ''" :is-link="permission === 'update'" size="large" />
 			</view>
 			<view @click="toOtherPage('location')">
-				<van-cell title="所在地" :is-link="permission === 'update'" size="large" />
+				<van-cell title="所在地" :value="user.userLocation || ''" :is-link="permission === 'update'" size="large" />
 			</view>
 			<view @click="toOtherPage('homeTown')">
-				<van-cell title="家乡" :is-link="permission === 'update'" size="large" />
+				<van-cell title="家乡" :value="user.userHometown || ''" :is-link="permission === 'update'" size="large" />
 			</view>
 			<view @click="toOtherPage('profession')">
-				<van-cell title="职业" :is-link="permission === 'update'" size="large" />
+				<van-cell title="职业" :value="user.userProfession || ''" :is-link="permission === 'update'" size="large" />
 			</view>
 			<view @click="toOtherPage('tag')">
 				<van-cell title="个性标签" :is-link="permission === 'update'" arrow-direction="down" size="large" />
 				<view class="tag">
-					<template>
+					<template v-for="(tag, index) in JSON.parse(user.userTags)">
 						<view class="tag-item">
-							<van-tag type="primary" size="large"></van-tag>
+							<van-tag type="primary" size="large">
+								{{ tag.text }}
+							</van-tag>
 						</view>
 					</template>
 				</view>
@@ -43,6 +45,9 @@
 	import {
 		role,
 		permission,
+		user
+	} from "./info.js"
+	import {
 		toOtherPage
 	} from "./info.js"
 	
@@ -58,6 +63,8 @@
 				title: "资料展示"
 			})
 		}
+		// 获取用户信息
+		user.value = uni.getStorageSync("user")
 	})
 </script>
 
