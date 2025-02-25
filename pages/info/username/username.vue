@@ -13,23 +13,19 @@
 
 <script setup>
 	import {
-		ref
-	} from "vue";
-
-	// 数据
-	let load = ref(false)
-	let placeholder = ref('输入新用户名')
-	let userName = ref('')
-
+		onLoad
+	} from "@dcloudio/uni-app"
+	import {
+		placeholder,
+		userName,
+		onSubmit
+	} from "./username.js"
+	
+	onLoad((e) => {
+		placeholder.value = e.param
+	})
 </script>
 
 <style lang="less" scoped>
-	.username {
-		width: 100vw;
-		height: 100vh;
-
-		.content {
-			padding: 10px;
-		}
-	}
+	@import url('./username.css');
 </style>

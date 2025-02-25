@@ -41,13 +41,92 @@
 
 <script setup>
 	import {
-		currentOption,
-		setCurrentOption,
-		onSwiperChange,
 		toOtherPage
 	} from "./message.js"
+	import {
+		ref
+	} from 'vue';
+	import {
+		relativeTime
+	} from '../../common/util/common.js'
+	import {
+		onShow,
+		onLoad
+	} from "@dcloudio/uni-app"
+
+	// 数据
+	let currentOption = ref(0)
+
+	// 设置新的currentOption
+	const setCurrentOption = (index) => {
+		currentOption.value = index
+	}
+
+	// 切换页面
+	const onSwiperChange = (event) => {
+		currentOption.value = event.detail.current
+	}
 </script>
 
 <style lang="less" scoped>
-	@import url('./message.css');
+	.message {
+		width: 100vw;
+		height: 100vh;
+
+		.title {
+			border-bottom: 1px solid #f5f4f1;
+			height: 40px;
+			display: flex;
+			justify-content: space-around;
+
+			.title-item {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				.underline {
+					width: 25px;
+					height: 5px;
+					background-color: white;
+					border-radius: 50px;
+					transition: all .2s;
+				}
+			}
+		}
+
+		.content {
+			width: 100%;
+			height: calc(100% - 40px);
+
+			.swiper {
+				width: 100%;
+				height: 100%;
+
+				swiper-item {
+					width: 100%;
+					height: 100%;
+
+					.swiper-item {
+						width: 100%;
+						height: 100%;
+
+						.userList {
+							width: 100%;
+							height: 100%;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.active-underline {
+		background-color: #FEE802 !important;
+	}
+
+	.active-title-item-text {
+		font-weight: bold;
+	}
 </style>

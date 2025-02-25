@@ -1,6 +1,7 @@
 const profession = [
     {
         "text": "工程与技术",
+		"activeIndex": 0,
         "children": [
             {
                 "text": "计算机科学与技术",
@@ -50,6 +51,7 @@ const profession = [
     },
     {
         "text": "商业与管理",
+		"activeIndex": 1,
         "children": [
             {
                 "text": "市场营销",
@@ -95,6 +97,7 @@ const profession = [
     },
     {
         "text": "医学",
+		"activeIndex": 2,
         "children": [
             {
                 "text": "临床医学",
@@ -132,6 +135,7 @@ const profession = [
     },
     {
         "text": "艺术与设计",
+		"activeIndex": 3,
         "children": [
             {
                 "text": "平面设计",
@@ -177,6 +181,7 @@ const profession = [
     },
     {
         "text": "教育与培训",
+		"activeIndex": 4,
         "children": [
             {
                 "text": "教育学",
@@ -210,6 +215,7 @@ const profession = [
     },
     {
         "text": "法律与社会工作",
+		"activeIndex": 5,
         "children": [
             {
                 "text": "法学",

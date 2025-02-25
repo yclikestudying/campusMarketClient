@@ -1,102 +1,102 @@
 .backgroundImg[data-v-e4e4508d] {
-	width: 100vw;
-	height: 100vh;
-	overflow: hidden;
-uni-image[data-v-e4e4508d] {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-		opacity: .3;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
+.backgroundImg uni-image[data-v-e4e4508d] {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.3;
 }
 .loginItem[data-v-e4e4508d] {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	margin: auto;
-	width: 80%;
-	height: 280px;
-.title[data-v-e4e4508d] {
-		font-size: 22px;
-		text-align: center;
-		font-weight: bold;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 80%;
+  height: 280px;
 }
-.option[data-v-e4e4508d] {
-		position: relative;
-		margin-top: 10px;
-		width: 100%;
-		display: flex;
-		text-align: center;
-		font-size: 16px;
-		font-weight: bold;
-.optionItem[data-v-e4e4508d] {
-			width: 50%;
-			padding: 5px 0;
-			border: 1px solid white;
+.loginItem .title[data-v-e4e4508d] {
+  font-size: 22px;
+  text-align: center;
+  font-weight: bold;
 }
-.slider[data-v-e4e4508d] {
-			position: absolute;
-			left: 0;
-			top: 0;
-			width: 50%;
-			height: 100%;
-			background-color: skyblue;
-			opacity: .5;
-			transition: all .2s;
+.loginItem .option[data-v-e4e4508d] {
+  position: relative;
+  margin-top: 10px;
+  width: 100%;
+  display: flex;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
 }
+.loginItem .option .optionItem[data-v-e4e4508d] {
+  width: 50%;
+  padding: 5px 0;
+  border: 1px solid white;
 }
-.phoneNumber[data-v-e4e4508d] {
-		margin-top: 10px;
-		width: 100%;
-		height: 35px;
-		border-radius: 50px;
-		font-size: 18px;
-		display: flex;
-		align-items: center;
-		justify-content: space-around;
-.type[data-v-e4e4508d] {
-			flex: 2;
-			height: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: space-around;
-			border-top-left-radius: 50px;
-			border-bottom-left-radius: 50px;
-			font-weight: bold;
+.loginItem .option .slider[data-v-e4e4508d] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background-color: skyblue;
+  opacity: 0.5;
+  transition: all 0.2s;
 }
-.line[data-v-e4e4508d] {
-			width: 1px;
-			height: 60%;
-			background-color: black;
+.loginItem .phoneNumber[data-v-e4e4508d] {
+  margin-top: 10px;
+  width: 100%;
+  height: 35px;
+  border-radius: 50px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
-.number[data-v-e4e4508d] {
-			flex: 7;
-			height: 100%;
-			display: flex;
-			align-items: center;
-			padding-left: 10px;
-			border-top-right-radius: 50px;
-			border-bottom-right-radius: 50px;
-uni-image[data-v-e4e4508d] {
-				position: relative;
-				right: 10px;
-				width: 20px;
-				height: 20px;
+.loginItem .phoneNumber .type[data-v-e4e4508d] {
+  flex: 2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top-left-radius: 50px;
+  border-bottom-left-radius: 50px;
+  font-weight: bold;
 }
+.loginItem .phoneNumber .line[data-v-e4e4508d] {
+  width: 1px;
+  height: 60%;
+  background-color: black;
 }
+.loginItem .phoneNumber .number[data-v-e4e4508d] {
+  flex: 7;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  border-top-right-radius: 50px;
+  border-bottom-right-radius: 50px;
 }
-.van-button[data-v-e4e4508d] {
-		margin-top: 10px;
+.loginItem .phoneNumber .number uni-image[data-v-e4e4508d] {
+  position: relative;
+  right: 10px;
+  width: 20px;
+  height: 20px;
 }
+.loginItem .van-button[data-v-e4e4508d] {
+  margin-top: 10px;
 }
 .activeImage[data-v-e4e4508d] {
-	display: none;
+  display: none;
 }
 .activeSlider[data-v-e4e4508d] {
-	transform: translateX(100%);
+  transform: translateX(100%);
 }
 .activeCheckPassword[data-v-e4e4508d] {
-	display: none !important;
+  display: none !important;
 }

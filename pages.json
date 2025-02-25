@@ -54,7 +54,10 @@
 				"app-plus": {
 					"bounce": "none",
 					"scrollIndicator": "none",
-					"titleNView": false
+					"titleNView": false,
+					"pullToRefresh": {
+						"support": true
+					}
 				}
 			}
 		},
@@ -227,10 +230,9 @@
 			}
 		},
 		{
-			"path" : "pages/info/profession/profession",
-			"style" : 
-			{
-				"navigationBarTitleText" : "职业",
+			"path": "pages/info/profession/profession",
+			"style": {
+				"navigationBarTitleText": "职业",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
@@ -243,10 +245,9 @@
 			}
 		},
 		{
-			"path" : "pages/info/tag/tag",
-			"style" : 
-			{
-				"navigationBarTitleText" : "标签",
+			"path": "pages/info/tag/tag",
+			"style": {
+				"navigationBarTitleText": "标签",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
@@ -259,10 +260,9 @@
 			}
 		},
 		{
-			"path" : "pages/info/gender/gender",
-			"style" : 
-			{
-				"navigationBarTitleText" : "性别",
+			"path": "pages/info/gender/gender",
+			"style": {
+				"navigationBarTitleText": "性别",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
@@ -275,10 +275,9 @@
 			}
 		},
 		{
-			"path" : "pages/my/friend/friend",
-			"style" : 
-			{
-				"navigationBarTitleText" : "好友",
+			"path": "pages/my/friend/friend",
+			"style": {
+				"navigationBarTitleText": "好友",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
@@ -291,10 +290,9 @@
 			}
 		},
 		{
-			"path" : "pages/message/chat/chat",
-			"style" : 
-			{
-				"navigationBarTitleText" : "聊天页面",
+			"path": "pages/message/chat/chat",
+			"style": {
+				"navigationBarTitleText": "聊天页面",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
@@ -307,10 +305,9 @@
 			}
 		},
 		{
-			"path" : "pages/my/setting/setting",
-			"style" : 
-			{
-				"navigationBarTitleText" : "设置页面",
+			"path": "pages/my/setting/setting",
+			"style": {
+				"navigationBarTitleText": "设置页面",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
@@ -318,6 +315,36 @@
 					"scrollIndicator": "none",
 					"titleNView": {
 						"titleText": "更多设置",
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/image/image",
+			"style" : 
+			{
+				"navigationBarTitleText" : "图片查看",
+				"animationType": "fade-in",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path" : "pages/article/article",
+			"style" : 
+			{
+				"navigationBarTitleText" : "动态详情",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
 						"backgroundColor": "#ffffff"
 					}
 				}

@@ -1,29 +1,20 @@
-import { ref } from "vue";
 
-/**
- * 数据
- */
-export let role = ref('') // 用户角色
-export let permission = ref('') // 用户权限
-export let user = ref(null); // 用户信息
-
-
-/**
- * 方法
- */
-export const toOtherPage = (name) => {
-	const routes = {
-		"username": "/pages/info/username/username",
-		"birthday": "/pages/info/birthday/birthday",
-		"profile": "/pages/info/profile/profile",
-		"location": "/pages/info/location/location",
-		"homeTown": "/pages/info/homeTown/homeTown",
-		"profession": "/pages/info/profession/profession",
-		"tag": "/pages/info/tag/tag",
-		"gender": "/pages/info/gender/gender"
+// 去到其他地方
+export const toOtherPage = (name, param, role) => {
+	if (role === 'me') {
+		const routes = {
+			"username": `/pages/info/username/username?param=${param}`,
+			"birthday": `/pages/info/birthday/birthday?param=${param}`,
+			"profile": `/pages/info/profile/profile?param=${param}`,
+			"location": `/pages/info/location/location?param=${param}`,
+			"homeTown": `/pages/info/homeTown/homeTown?param=${param}`,
+			"profession": `/pages/info/profession/profession?param=${param}`,
+			"tag": `/pages/info/tag/tag?param=${param}`,
+			"gender": `/pages/info/gender/gender?param=${param}`
+		}
+		const url = routes[`${name}`]
+		uni.navigateTo({
+			url: url
+		})
 	}
-	const url = routes[`${name}`]
-	uni.navigateTo({
-		url: url
-	})
 }

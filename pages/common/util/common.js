@@ -5,19 +5,19 @@ let currentTime = null
  */
 export const userInfoProgress = () => {
 	const user = uni.getStorageSync("user")
-	const totle = Object.keys(user).length - 2;
+	const totle = Object.keys(user).length - 6;
 	let count = 0;
 	for (let item in user) {
-		if (
-			!user[`${item}`] &&
-			item !== "userAvatar" &&
-			item !== "createTime"
-		) {
+		if (item === 'userGender' && user[`${item}`] !== null) {
+			count++;
+			continue;
+		}
+		if (item !== "createTime" && item !== 'userId' && item !== 'userAvatar' && item !== 'isAdmin' && item !== 'userPhone' && item !== "userPassword" && user[`${item}`] !== null) {
 			count++;
 		}
 	}
 
-	return Math.round(((totle - count) / totle) * 100) + "%";
+	return Math.round((count / totle) * 100) + "%";
 };
 
 /**

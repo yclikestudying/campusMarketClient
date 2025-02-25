@@ -36,6 +36,12 @@
 		ref,
 		watch
 	} from "vue";
+	import {
+		onLoad
+	} from "@dcloudio/uni-app"
+	import {
+		request
+	} from "/pages/common/util/request.js"
 
 	// 数据
 	let activeIds = ref([])
@@ -51,6 +57,39 @@
 	watch(activeIds, (value) => {
 		tags.value = getHobbies(value)
 	})
+	
+	onLoad((e) => {
+		if (e.param !== 'null') {
+			tags.value = JSON.parse(e.param)
+			activeIds.value = tags.value.map(tag => tag.id)
+		}
+	})
+	
+	const onSubmit = async () => {
+		if (tags.value.length === 0) {
+			uni.showToast({
+				title: "标签不能为空",
+				icon: "none"
+			})
+			return;
+		}
+		const res = await request("/userInfo/updateUser", "PUT", {
+			'key': 'userTags',
+			'value': JSON.stringify(tags.value)
+		})
+		if (res.data.code === 200) {
+			uni.showToast({
+				title: "修改成功"
+			})
+			// 重新查询用户信息
+			const res = await request("/userInfo/getUserInfoByUserId", "GET", null)
+			if (res.data.code === 200) {
+				uni.setStorageSync("user", res.data.data)
+			}
+	
+			uni.navigateBack()
+		}
+	}
 </script>
 
 <style lang="less" scoped>

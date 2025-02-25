@@ -6,33 +6,24 @@ import {
 	requestPromise
 } from "/pages/common/util/request.js"
 
-//数据
-export let userAvatar = ref(''); // 用户头像
-export let userName = ref(''); // 用户名称
-export let isAdmin = ref(0); // 管理员
-export let articleCount = ref(0); // 动态数量
-export let attentionFansCount = ref(0); // 互关数量
-export let attentionCount = ref(0); // 关注数量
-export let fansCount = ref(0); // 粉丝数量
-
 // 查询动态数量
-export const getArticleCount = async () => {
-	return await requestPromise("/article/articleCount", "GET", null)
+export const getArticle = async () => {
+	return await requestPromise("/article/queryArticleByUserId", "GET", null)
 }
 
 // 查询互关数量
-export const getAttentionFansCount = async () => {
-	return await requestPromise("/friend/attentionAndFansCount", "GET", null)
+export const getAttentionFans = async () => {
+	return await requestPromise("/friend/attentionAndFans", "GET", null)
 }
 
 // 查询关注数量
-export const getAttentionCount = async () => {
-	return await requestPromise("/friend/attentionCount", "GET", null)
+export const getAttention = async () => {
+	return await requestPromise("/friend/attention", "GET", null)
 }
 
 // 查询粉丝数量
-export const getFansCount = async () => {
-	return await requestPromise("/friend/fansCount", "GET", null)
+export const getFans = async () => {
+	return await requestPromise("/friend/fans", "GET", null)
 }
 
 // 跳转到其他页面

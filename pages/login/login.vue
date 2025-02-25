@@ -68,5 +68,121 @@
 </script>
 
 <style lang="less" scoped>
-	@import url("./login.css");
+	.backgroundImg {
+		width: 100vw;
+		height: 100vh;
+		overflow: hidden;
+
+		image {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			opacity: .3;
+		}
+	}
+
+	.loginItem {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		margin: auto;
+		width: 80%;
+		height: 280px;
+
+		.title {
+			font-size: 22px;
+			text-align: center;
+			font-weight: bold;
+		}
+
+		.option {
+			position: relative;
+			margin-top: 10px;
+			width: 100%;
+			display: flex;
+			text-align: center;
+			font-size: 16px;
+			font-weight: bold;
+
+			.optionItem {
+				width: 50%;
+				padding: 5px 0;
+				border: 1px solid white;
+			}
+
+			.slider {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 50%;
+				height: 100%;
+				background-color: skyblue;
+				opacity: .5;
+				transition: all .2s;
+			}
+		}
+
+		.phoneNumber {
+			margin-top: 10px;
+			width: 100%;
+			height: 35px;
+			border-radius: 50px;
+			font-size: 18px;
+			display: flex;
+			align-items: center;
+			justify-content: space-around;
+
+			.type {
+				flex: 2;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: space-around;
+				border-top-left-radius: 50px;
+				border-bottom-left-radius: 50px;
+				font-weight: bold;
+			}
+
+			.line {
+				width: 1px;
+				height: 60%;
+				background-color: black;
+			}
+
+			.number {
+				flex: 7;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				padding-left: 10px;
+				border-top-right-radius: 50px;
+				border-bottom-right-radius: 50px;
+
+				image {
+					position: relative;
+					right: 10px;
+					width: 20px;
+					height: 20px;
+				}
+			}
+		}
+
+		.van-button {
+			margin-top: 10px;
+		}
+	}
+
+	.activeImage {
+		display: none;
+	}
+
+	.activeSlider {
+		transform: translateX(100%);
+	}
+
+	.activeCheckPassword {
+		display: none !important;
+	}
 </style>

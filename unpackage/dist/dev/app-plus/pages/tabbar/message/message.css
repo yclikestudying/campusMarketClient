@@ -203,52 +203,52 @@
   padding: 0;
 }
 .message[data-v-11ed8511] {
-	width: 100vw;
-	height: 100vh;
-.title[data-v-11ed8511] {
-		border-bottom: 1px solid #f5f4f1;
-		height: 40px;
-		display: flex;
-		justify-content: space-around;
-.title-item[data-v-11ed8511] {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-.underline[data-v-11ed8511] {
-				width: 25px;
-				height: 5px;
-				background-color: white;
-				border-radius: 50px;
-				transition: all .2s;
+  width: 100vw;
+  height: 100vh;
 }
+.message .title[data-v-11ed8511] {
+  border-bottom: 1px solid #f5f4f1;
+  height: 40px;
+  display: flex;
+  justify-content: space-around;
 }
+.message .title .title-item[data-v-11ed8511] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
-.content[data-v-11ed8511] {
-		width: 100%;
-		height: calc(100% - 40px);
-.swiper[data-v-11ed8511] {
-			width: 100%;
-			height: 100%;
-uni-swiper-item[data-v-11ed8511] {
-				width: 100%;
-				height: 100%;
-.swiper-item[data-v-11ed8511] {
-					width: 100%;
-					height: 100%;
-.userList[data-v-11ed8511] {
-						width: 100%;
-						height: 100%;
+.message .title .title-item .underline[data-v-11ed8511] {
+  width: 25px;
+  height: 5px;
+  background-color: white;
+  border-radius: 50px;
+  transition: all 0.2s;
 }
+.message .content[data-v-11ed8511] {
+  width: 100%;
+  height: calc(100% - 40px);
 }
+.message .content .swiper[data-v-11ed8511] {
+  width: 100%;
+  height: 100%;
 }
+.message .content .swiper uni-swiper-item[data-v-11ed8511] {
+  width: 100%;
+  height: 100%;
 }
+.message .content .swiper uni-swiper-item .swiper-item[data-v-11ed8511] {
+  width: 100%;
+  height: 100%;
 }
+.message .content .swiper uni-swiper-item .swiper-item .userList[data-v-11ed8511] {
+  width: 100%;
+  height: 100%;
 }
 .active-underline[data-v-11ed8511] {
-	background-color: #FEE802 !important;
+  background-color: #FEE802 !important;
 }
 .active-title-item-text[data-v-11ed8511] {
-	font-weight: bold;
+  font-weight: bold;
 }

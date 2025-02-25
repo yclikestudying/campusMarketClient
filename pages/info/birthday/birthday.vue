@@ -15,13 +15,51 @@
 </template>
 
 <script setup>
-
+	import {
+		onLoad
+	} from "@dcloudio/uni-app"
 	import {
 		ref
 	} from "vue";
+	import {
+		request
+	} from "/pages/common/util/request.js"
 
 	// 数据
-	let birthday = ref(uni.getStorageSync("userInfo").userBirthday);
+	let birthday = ref('');
+	
+	onLoad((e) => {
+		if (e.param !== 'null') {
+			birthday.value = e.param
+		}
+	})
+	
+	const onSubmit = async () => {
+		if (birthday.value.length === 0) {
+			uni.showToast({
+				title: "出生日期不能为空",
+				icon: "none"
+			})
+			return;
+		}
+		
+		const res = await request("/userInfo/updateUser", "PUT", {
+			'key': 'userBirthday',
+			'value': birthday.value
+		})
+		if (res.data.code === 200) {
+			uni.showToast({
+				title: "修改成功"
+			})
+			// 重新查询用户信息
+			const res = await request("/userInfo/getUserInfoByUserId", "GET", null)
+			if (res.data.code === 200) {
+				uni.setStorageSync("user", res.data.data)
+			}
+	
+			uni.navigateBack()
+		}
+	}
 </script>
 
 <style lang="less" scoped>

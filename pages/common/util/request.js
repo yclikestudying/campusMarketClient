@@ -38,14 +38,27 @@ export const requestPromise = async (url, method, data) => {
 }
 
 /**
- * 上传文件
+ * 上传单个文件
  */
-export const pushFile = async (url, data, count, textContent) => {
+export const singleFile = async (url, filePath) => {
 	return await uni.uploadFile({
 		url: `${baseURL}${url}`,
-		files: data,
+		filePath: filePath, 
+		name: "file",
+		header: {
+			"Authorization": uni.getStorageSync("token")
+		}
+	});
+}
+
+/**
+ * 并发上传多个文件
+ */
+export const moreFile = async (url, files, textContent) => {
+	return await uni.uploadFile({
+		url: `${baseURL}${url}`,
+		files: files,
 		formData: {
-			"count": count, // 文件数量
 			"text": textContent // 文本内容
 		},
 		header: {
