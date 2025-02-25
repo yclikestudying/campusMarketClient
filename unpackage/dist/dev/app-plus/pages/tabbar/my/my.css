@@ -603,6 +603,7 @@
   background-color: #ffffff;
   display: flex;
   border-radius: 10px;
+  overflow: hidden;
 }
 .my .content .data .data-item[data-v-9f9395c5] {
   width: 25%;

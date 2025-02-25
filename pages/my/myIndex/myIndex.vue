@@ -121,14 +121,14 @@
 														@click="deleteByArticleId(article.articleId)"></uni-icons>
 												</view>
 												<view class="bottom">
-													<text>{{ formatDate(article.createTime) }}</text>
+													<text>{{ relativeTime(article.createTime, 'other') }}</text>
 												</view>
 											</view>
 										</view>
-										<view class="text" @click="toOtherPage('article', article.articleId)">
+										<view class="text" @click="toOtherPage('article', role, permission, article)">
 											<text>{{ article.articleContent }}</text>
 										</view>
-										<view class="image" @click="toOtherPage('article', article.articleId)">
+										<view class="image" @click="toOtherPage('article', role, permission, article)">
 											<template v-for="(photo, index) in JSON.parse(article.articlePhotos)">
 												<view class="photo"
 													@click.stop="toOtherPage('image', role, permission, photo, 'photo')">
@@ -184,6 +184,7 @@
 	} from "vue";
 	import {
 		formatDate,
+		relativeTime,
 		userInfoProgress
 	} from "../../common/util/common.js"
 	import {
@@ -385,144 +386,6 @@
 	const scroll = (e) => {
 		isScroll.value = e.detail.scrollTop > 325 ? true : false
 	}
-
-	// import {
-	// 	formatDate,
-	// 	userInfoProgress
-	// } from "../../common/util/common.js"
-	// import {
-	// 	onLoad,
-	// 	onShow
-	// } from "@dcloudio/uni-app"
-	// import {
-	// 	ref
-	// } from 'vue';
-
-
-	// // 数据
-	// let role = ref(null); // 角色
-	// let permission = ref(null); // 权限
-	// let currentOption = ref(1)
-	// let isScroll = ref(false)
-	// let user = ref(null); // 用户信息
-	// let articles = ref([]); // 文章动态
-	// let attentionCount = ref(null); // 关注数量
-	// let fansCount = ref(null); // 粉丝数量
-	// let likeMap = ref(null); // 动态点赞map
-	// let commentMap = ref(null); // 动态评论map
-	// let isLoading = ref(false); // 是否加载
-	// let progress = ref(null); // 资料完善进度
-	// let userId = ref(null)
-
-	// onLoad(async (e) => {
-	// 	console.log(e)
-	// 	// 获取角色和权限
-	// 	role.value = e.role
-	// 	permission.value = e.permission
-
-	// 	// 查询自己的数据
-	// 	if (role.value === 'me') {
-	// 		// 获取用户信息
-	// 		user.value = uni.getStorageSync("user")
-	// 		uni.setNavigationBarTitle({
-	// 			title: user.value.userName
-	// 		})
-	// 		try {
-	// 			isLoading.value = true
-	// 			// 并发请求
-	// 			const [res1, res2, res3] = await Promise.all([
-	// 				// 获取关注数量
-	// 				getAttentionCount("/friend/attentionCount"),
-	// 				// 获取粉丝数量
-	// 				getFansCount("/friend/fansCount"),
-	// 				// 获取动态相关信息
-	// 				getArticle("/article/queryArticleByUserId")
-	// 			])
-	// 			attentionCount.value = res1
-	// 			fansCount.value = res2
-	// 			articles.value = res3
-	// 		} catch (err) {
-	// 			console.log(err)
-	// 		} finally {
-	// 			isLoading.value = false
-	// 		}
-	// 		return;
-	// 	}
-	// 	if (role.value === 'other') {
-	// 		// 查询别人的数据
-	// 		const id = e.userId
-	// 		try {
-	// 			isLoading.value = true
-	// 			// 并发请求
-	// 			const [res1, res2, res3, res4] = await Promise.all([
-	// 				// 获取关注数量
-	// 				getAttentionCount(`/friend/attentionCount?userId=${e.userId}`),
-	// 				// 获取粉丝数量
-	// 				getFansCount(`/friend/fansCount?userId=${e.userId}`),
-	// 				// 获取动态相关信息
-	// 				getArticle(`/article/queryArticleByUserId?userId=${e.userId}`),
-	// 				// 获取用户信息
-	// 				getUserInfo(`/userInfo/getUserInfoByUserId?userId=${e.userId}`)
-	// 			])
-	// 			attentionCount.value = res1
-	// 			fansCount.value = res2
-	// 			articles.value = res3
-	// 			console.log(articles.value)
-	// 			user.value = res4
-	// 			uni.setNavigationBarTitle({
-	// 				title: user.value.userName
-	// 			})
-	// 		} catch (err) {
-	// 			console.log(err)
-	// 		} finally {
-	// 			isLoading.value = false
-	// 		}
-	// 	}
-	// })
-
-	// onShow(() => {
-	// 	if (role.value === 'me') {
-	// 		// 获取用户信息
-	// 		user.value = uni.getStorageSync("user")
-	// 		uni.setNavigationBarTitle({
-	// 			title: user.value.userName
-	// 		})
-	// 		progress.value = userInfoProgress()
-	// 	}
-	// })
-
-	// // 取消点赞
-	// const unlike = async (articleId, id) => {
-	// 	// const res = await request(`/likes/unlike?articleId=${articleId}&userId=${user.value.userId}`, "PUT", null)
-	// 	// if (res.data.code === 200) {
-	// 	// 	const res1 = await request(`/article/queryArticleByUserId?userId=${id}`, "GET", null)
-	// 	// 	articles.value = res1.data.data
-	// 	// 	uni.showToast({
-	// 	// 		title: "取消点赞成功"
-	// 	// 	})
-	// 	// }
-	// }
-
-	// // 删除动态
-	// const deleteByArticleId = (id) => {
-	// 	uni.showModal({
-	// 		title: '温馨提示',
-	// 		content: '确认删除该动态吗',
-	// 		success: async function(res) {
-	// 			if (res.confirm) {
-	// 				const res = await request(`/article/deleteArticleByArticleId?articleId=${id}`,
-	// 					"DELETE",
-	// 					null)
-	// 				if (res.data.code === 200) {
-	// 					articles.value = articles.value.filter(article => article.articleId !== id)
-	// 					uni.showToast({
-	// 						title: "删除成功"
-	// 					})
-	// 				}
-	// 			}
-	// 		}
-	// 	});
-	// }
 </script>
 <style lang="less" scoped>
 	.myIndex {

@@ -128,8 +128,8 @@
 	let currentOption = ref(0); // 当前选项
 	
 	onShow(async () => {
-		const res = await getAttentionArticle("/article/queryArticleOfAttention")
-		console.log(res)
+		// const res = await getAttentionArticle("/article/queryArticleOfAttention")
+		// console.log(res)
 	})
 
 	// 设置新的选项

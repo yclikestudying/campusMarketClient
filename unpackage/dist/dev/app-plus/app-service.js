@@ -1056,7 +1056,7 @@ if (uni.restoreGlobal) {
       /* CLASS, STYLE */
     );
   }
-  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$E], ["__scopeId", "data-v-d31e1c47"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
+  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$F, [["render", _sfc_render$E], ["__scopeId", "data-v-d31e1c47"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-icons/components/uni-icons/uni-icons.vue"]]);
   let platform$1 = "other";
   const _sfc_main$E = {
     name: "UniFab",
@@ -1215,7 +1215,7 @@ if (uni.restoreGlobal) {
     }
   };
   function _sfc_render$D(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-cursor-point" }, [
       $props.popMenu && ($options.leftBottom || $options.rightBottom || $options.leftTop || $options.rightTop) && $props.content.length > 0 ? (vue.openBlock(), vue.createElementBlock(
         "view",
@@ -1318,7 +1318,7 @@ if (uni.restoreGlobal) {
       )
     ]);
   }
-  const __easycom_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$D], ["__scopeId", "data-v-85f34dfc"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-fab/components/uni-fab/uni-fab.vue"]]);
+  const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$D], ["__scopeId", "data-v-85f34dfc"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-fab/components/uni-fab/uni-fab.vue"]]);
   let opacity = vue.ref(0);
   let isScroll = vue.ref(false);
   let currentMenu = vue.ref(0);
@@ -1369,7 +1369,7 @@ if (uni.restoreGlobal) {
       url
     });
   };
-  const toOtherPage$4 = (name2) => {
+  const toOtherPage$5 = (name2) => {
     const routes = {
       "搜索": "/pages/home/search/search"
     };
@@ -1448,7 +1448,7 @@ if (uni.restoreGlobal) {
       }, get scroll() {
         return scroll;
       }, get toOtherPage() {
-        return toOtherPage$4;
+        return toOtherPage$5;
       }, get fabClick() {
         return fabClick;
       }, get trigger() {
@@ -1464,8 +1464,8 @@ if (uni.restoreGlobal) {
   };
   function _sfc_render$C(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_van_button = vue.resolveComponent("van-button");
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
-    const _component_uni_fab = resolveEasycom(vue.resolveDynamicComponent("uni-fab"), __easycom_1$1);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
+    const _component_uni_fab = resolveEasycom(vue.resolveDynamicComponent("uni-fab"), __easycom_1$2);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -1698,8 +1698,6 @@ if (uni.restoreGlobal) {
       __expose();
       let currentOption = vue.ref(0);
       onShow(async () => {
-        const res = await getAttentionArticle("/article/queryArticleOfAttention");
-        formatAppLog("log", "at pages/tabbar/share/share.vue:132", res);
       });
       const setCurrentOption = (index) => {
         currentOption.value = index;
@@ -1723,7 +1721,7 @@ if (uni.restoreGlobal) {
   function _sfc_render$B(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_van_search = vue.resolveComponent("van-search");
     const _component_van_button = vue.resolveComponent("van-button");
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     return vue.openBlock(), vue.createElementBlock("view", { class: "allPage" }, [
       vue.createElementVNode("view", {
         class: "share",
@@ -5515,8 +5513,8 @@ ${o3}
       ])
     ], 8, ["hover-class"]);
   }
-  const __easycom_0$6 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["__scopeId", "data-v-20df4ef0"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-list/components/uni-list-chat/uni-list-chat.vue"]]);
-  const toOtherPage$3 = (name2) => {
+  const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["__scopeId", "data-v-20df4ef0"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-list/components/uni-list-chat/uni-list-chat.vue"]]);
+  const toOtherPage$4 = (name2) => {
     formatAppLog("log", "at pages/tabbar/message/message.js:4", "点击");
     const routes = {
       "chat": "/pages/message/chat/chat"
@@ -5609,7 +5607,7 @@ ${o3}
       }, set currentOption(v2) {
         currentOption = v2;
       }, setCurrentOption, onSwiperChange: onSwiperChange2, get toOtherPage() {
-        return toOtherPage$3;
+        return toOtherPage$4;
       }, ref: vue.ref, get relativeTime() {
         return relativeTime;
       }, get onShow() {
@@ -5622,7 +5620,7 @@ ${o3}
     }
   };
   function _sfc_render$z(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_0$6);
+    const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_2);
     return vue.openBlock(), vue.createElementBlock("view", { class: "message" }, [
       vue.createElementVNode("view", { class: "title" }, [
         vue.createElementVNode("view", {
@@ -5725,7 +5723,7 @@ ${o3}
   const getFans$1 = async () => {
     return await requestPromise("/friend/fans", "GET", null);
   };
-  const toOtherPage$2 = (name2) => {
+  const toOtherPage$3 = (name2) => {
     const routes = {
       "myIndex": "/pages/my/myIndex/myIndex?role=me&permission=update",
       "attentionFans": "/pages/my/friend/friend?keyword=互关",
@@ -5816,7 +5814,7 @@ ${o3}
       }, set isLoading(v2) {
         isLoading2 = v2;
       }, fetch, ref: vue.ref, get toOtherPage() {
-        return toOtherPage$2;
+        return toOtherPage$3;
       }, get getArticle() {
         return getArticle$1;
       }, get getAttentionFans() {
@@ -5837,7 +5835,7 @@ ${o3}
     }
   };
   function _sfc_render$y(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     const _component_SmallLoading = vue.resolveComponent("SmallLoading");
     const _component_van_cell = vue.resolveComponent("van-cell");
     return vue.openBlock(), vue.createElementBlock("view", { class: "my" }, [
@@ -6359,7 +6357,7 @@ ${o3}
     }
   };
   function _sfc_render$x(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -6483,7 +6481,7 @@ ${o3}
       /* CLASS, STYLE */
     );
   }
-  const __easycom_0$5 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["__scopeId", "data-v-09fd5285"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.vue"]]);
+  const __easycom_1$1 = /* @__PURE__ */ _export_sfc(_sfc_main$y, [["render", _sfc_render$x], ["__scopeId", "data-v-09fd5285"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.vue"]]);
   const ERR_MSG_OK = "chooseAndUploadFile:ok";
   const ERR_MSG_FAIL = "chooseAndUploadFile:fail";
   function chooseImage(opts) {
@@ -7871,7 +7869,7 @@ ${o3}
     }
   };
   function _sfc_render$t(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_0$5);
+    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
     const _component_uni_file_picker = resolveEasycom(vue.resolveDynamicComponent("uni-file-picker"), __easycom_1);
     const _component_van_button = vue.resolveComponent("van-button");
     return vue.openBlock(), vue.createElementBlock("view", { class: "schoolShare" }, [
@@ -7938,7 +7936,7 @@ ${o3}
     }
   };
   function _sfc_render$s(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_0$5);
+    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
     const _component_van_cell = vue.resolveComponent("van-cell");
     const _component_uni_file_picker = resolveEasycom(vue.resolveDynamicComponent("uni-file-picker"), __easycom_1);
     const _component_van_button = vue.resolveComponent("van-button");
@@ -8015,7 +8013,7 @@ ${o3}
     }
   };
   function _sfc_render$r(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_0$5);
+    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
     const _component_van_cell = vue.resolveComponent("van-cell");
     const _component_uni_file_picker = resolveEasycom(vue.resolveDynamicComponent("uni-file-picker"), __easycom_1);
     const _component_van_button = vue.resolveComponent("van-button");
@@ -8518,7 +8516,7 @@ ${o3}
     }
   };
   function _sfc_render$q(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-searchbar" }, [
       vue.createElementVNode(
         "view",
@@ -8678,7 +8676,7 @@ ${o3}
   function _sfc_render$p(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_search_bar = resolveEasycom(vue.resolveDynamicComponent("uni-search-bar"), __easycom_0$4);
     const _component_SmallLoading = vue.resolveComponent("SmallLoading");
-    const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_0$6);
+    const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_2);
     return vue.openBlock(), vue.createElementBlock(
       vue.Fragment,
       null,
@@ -8798,14 +8796,17 @@ ${o3}
   const getUserInfo = async (url) => {
     return await requestPromise(url, "GET", null);
   };
-  const toOtherPage$1 = (name2, role, permission, param, type) => {
+  const toOtherPage$2 = (name2, role, permission, param, type) => {
     const routes = {
       "info": `/pages/my/info/info?role=${role}&permission=${permission}`,
-      "image": `/pages/image/image?role=${role}&permission=${permission}&type=${type}`
-      // "article": `/pages/article/article?role=${role.value}&permission=${permission.value}&articleId=${param}`
+      "image": `/pages/image/image?role=${role}&permission=${permission}&type=${type}`,
+      "article": `/pages/article/article?role=${role}&permission=${permission}`
     };
     if (name2 === "image") {
       uni.setStorageSync("image", param);
+    }
+    if (name2 === "article") {
+      uni.setStorageSync("article", param);
     }
     const url = routes[`${name2}`];
     uni.navigateTo({
@@ -8852,7 +8853,7 @@ ${o3}
             fansList.value = res2;
             articles.value = res3;
           } catch (err) {
-            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:247", err);
+            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:248", err);
           }
         } else {
           try {
@@ -8872,7 +8873,7 @@ ${o3}
             articles.value = res4;
             uni.setStorageSync("other", user.value);
           } catch (err) {
-            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:269", err);
+            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:270", err);
           } finally {
           }
         }
@@ -9025,6 +9026,8 @@ ${o3}
         return onShow;
       }, ref: vue.ref, get formatDate() {
         return formatDate;
+      }, get relativeTime() {
+        return relativeTime;
       }, get userInfoProgress() {
         return userInfoProgress;
       }, get getAttention() {
@@ -9034,7 +9037,7 @@ ${o3}
       }, get getUserInfo() {
         return getUserInfo;
       }, get toOtherPage() {
-        return toOtherPage$1;
+        return toOtherPage$2;
       }, get attentionUser() {
         return attentionUser;
       }, get isAttention() {
@@ -9060,7 +9063,7 @@ ${o3}
     var _a, _b, _c, _d, _e2, _f;
     const _component_van_icon = vue.resolveComponent("van-icon");
     const _component_van_button = vue.resolveComponent("van-button");
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     const _component_van_tag = vue.resolveComponent("van-tag");
     const _component_TopLoading = vue.resolveComponent("TopLoading");
     const _component_van_empty = vue.resolveComponent("van-empty");
@@ -9399,7 +9402,7 @@ ${o3}
                                 vue.createElementVNode(
                                   "text",
                                   null,
-                                  vue.toDisplayString($setup.formatDate(article.createTime)),
+                                  vue.toDisplayString($setup.relativeTime(article.createTime, "other")),
                                   1
                                   /* TEXT */
                                 )
@@ -9408,7 +9411,7 @@ ${o3}
                           ]),
                           vue.createElementVNode("view", {
                             class: "text",
-                            onClick: ($event) => $setup.toOtherPage("article", article.articleId)
+                            onClick: ($event) => $setup.toOtherPage("article", $setup.role, $setup.permission, article)
                           }, [
                             vue.createElementVNode(
                               "text",
@@ -9420,7 +9423,7 @@ ${o3}
                           ], 8, ["onClick"]),
                           vue.createElementVNode("view", {
                             class: "image",
-                            onClick: ($event) => $setup.toOtherPage("article", article.articleId)
+                            onClick: ($event) => $setup.toOtherPage("article", $setup.role, $setup.permission, article)
                           }, [
                             (vue.openBlock(true), vue.createElementBlock(
                               vue.Fragment,
@@ -9521,7 +9524,7 @@ ${o3}
     );
   }
   const PagesMyMyIndexMyIndex = /* @__PURE__ */ _export_sfc(_sfc_main$p, [["render", _sfc_render$o], ["__scopeId", "data-v-fc8ca2d6"], ["__file", "E:/code/design/client/CampusMarket/pages/my/myIndex/myIndex.vue"]]);
-  const toOtherPage = (name2, param, role) => {
+  const toOtherPage$1 = (name2, param, role) => {
     if (role === "me") {
       const routes = {
         "username": `/pages/info/username/username?param=${param}`,
@@ -9583,7 +9586,7 @@ ${o3}
       }, get onShow() {
         return onShow;
       }, ref: vue.ref, get toOtherPage() {
-        return toOtherPage;
+        return toOtherPage$1;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
@@ -9763,7 +9766,7 @@ ${o3}
     }
   };
   function _sfc_render$m(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_0$5);
+    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
     const _component_van_button = vue.resolveComponent("van-button");
     return vue.openBlock(), vue.createElementBlock("view", { class: "username" }, [
       vue.createElementVNode("view", { class: "content" }, [
@@ -11682,7 +11685,7 @@ ${o3}
   function _sfc_render$j(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_calendar_item = vue.resolveComponent("calendar-item");
     const _component_time_picker = vue.resolveComponent("time-picker");
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     return vue.openBlock(), vue.createElementBlock(
       "view",
       {
@@ -12630,7 +12633,7 @@ ${o3}
     }
   };
   function _sfc_render$i(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     const _component_time_picker = vue.resolveComponent("time-picker");
     const _component_Calendar = vue.resolveComponent("Calendar");
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-date" }, [
@@ -13113,7 +13116,7 @@ ${o3}
     }
   };
   function _sfc_render$g(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_0$5);
+    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
     const _component_van_button = vue.resolveComponent("van-button");
     return vue.openBlock(), vue.createElementBlock("view", { class: "profile" }, [
       vue.createElementVNode("view", { class: "content" }, [
@@ -14273,7 +14276,7 @@ ${o3}
   };
   function _sfc_render$d(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_uni_load_more = resolveEasycom(vue.resolveDynamicComponent("uni-load-more"), __easycom_0$2);
-    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_1$2);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     const _component_data_picker_view = vue.resolveComponent("data-picker-view");
     return vue.openBlock(), vue.createElementBlock("view", { class: "uni-data-tree" }, [
       vue.createElementVNode("view", {
@@ -17739,6 +17742,11 @@ ${o3}
           }
         }
       });
+      const onClick = (userId2) => {
+        uni.navigateTo({
+          url: `/pages/my/myIndex/myIndex?role=other&permission=read&userId=${userId2}`
+        });
+      };
       const __returned__ = { get userId() {
         return userId;
       }, set userId(v2) {
@@ -17747,7 +17755,7 @@ ${o3}
         return users;
       }, set users(v2) {
         users = v2;
-      }, get onLoad() {
+      }, onClick, get onLoad() {
         return onLoad;
       }, ref: vue.ref, get getFriend() {
         return getFriend;
@@ -17758,7 +17766,7 @@ ${o3}
   };
   function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     const _component_van_empty = vue.resolveComponent("van-empty");
-    const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_0$6);
+    const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_2);
     return vue.openBlock(), vue.createElementBlock("view", { class: "friend" }, [
       vue.createElementVNode("scroll-view", {
         "scroll-y": "true",
@@ -17773,10 +17781,12 @@ ${o3}
           vue.renderList($setup.users, (user, index) => {
             return vue.openBlock(), vue.createBlock(_component_uni_list_chat, {
               key: user.userId,
+              clickable: "",
               title: user.userName,
               avatar: user.userAvatar,
-              note: user.userProfile
-            }, null, 8, ["title", "avatar", "note"]);
+              note: user.userProfile,
+              onClick: ($event) => $setup.onClick(user.userId)
+            }, null, 8, ["title", "avatar", "note", "onClick"]);
           }),
           128
           /* KEYED_FRAGMENT */
@@ -17808,7 +17818,7 @@ ${o3}
     }
   };
   function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
-    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_0$5);
+    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
     return vue.openBlock(), vue.createElementBlock("view", { class: "chat" }, [
       vue.createElementVNode("view", { class: "content" }, [
         vue.createElementVNode("scroll-view", {
@@ -18011,70 +18021,319 @@ ${o3}
     ]);
   }
   const PagesImageImage = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-fa36ddbe"], ["__file", "E:/code/design/client/CampusMarket/pages/image/image.vue"]]);
+  const toOtherPage = (name2, role, permission, param, type) => {
+    const routes = {
+      "image": `/pages/image/image?role=${role}&permission=${permission}&type=${type}`,
+      "myIndex": `/pages/my/myIndex/myIndex?role=${role}&permission=${permission}&userId=${param}`
+    };
+    if (name2 === "image") {
+      uni.setStorageSync("image", param);
+    }
+    const url = routes[`${name2}`];
+    uni.navigateTo({
+      url
+    });
+  };
   const _sfc_main$3 = {
     __name: "article",
     setup(__props, { expose: __expose }) {
       __expose();
-      const __returned__ = {};
+      let role = vue.ref("");
+      let permission = vue.ref("");
+      let article = vue.ref(uni.getStorageSync("article"));
+      let myId = vue.ref(uni.getStorageSync("user").userId);
+      let otherId = vue.ref(article.value.publishUser.userId);
+      let content2 = vue.ref("");
+      onLoad((e2) => {
+        role.value = e2.role;
+        permission.value = e2.permission;
+      });
+      const deleteComment = (articleId, commentId) => {
+        uni.showModal({
+          title: "温馨提示",
+          content: "确认删除该评论吗",
+          success: async function(res) {
+            if (res.confirm) {
+              const res1 = await request(
+                `/comment/delete?articleId=${articleId}&commentId=${commentId}&userId=${otherId.value}`,
+                "DELETE",
+                null
+              );
+              if (res1.data.code === 200) {
+                const res2 = await requestPromise(`/article/queryArticleByUserId?userId=${otherId.value}`, "GET", null);
+                article.value = res2.find((article2) => article2.articleId === articleId);
+                uni.showToast({
+                  title: "删除成功"
+                });
+              }
+            }
+          }
+        });
+      };
+      const publishComment = async (articleId) => {
+        if (content2.value.length !== 0) {
+          const res = await request("/comment/publish", "POST", {
+            articleId,
+            content: content2.value,
+            userId: otherId.value
+          });
+          if (res.data.code === 200) {
+            const res1 = await requestPromise(`/article/queryArticleByUserId?userId=${otherId.value}`, "GET", null);
+            article.value = res1.find((article2) => article2.articleId === articleId);
+            content2.value = "";
+            uni.showToast({
+              title: "发表成功"
+            });
+          }
+        } else {
+          uni.showToast({
+            title: "内容不能为空"
+          });
+        }
+      };
+      const isLike2 = (articleId, id) => {
+        if (article.value.like.articleUserVOList) {
+          for (let user of article.value.like.articleUserVOList) {
+            if (user.userId === id) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+      const like = async (articleId) => {
+        const res = await request(`/likes/like?articleId=${articleId}&userId=${otherId.value}`, "PUT", null);
+        if (res.data.code === 200) {
+          const res1 = await requestPromise(`/article/queryArticleByUserId?userId=${otherId.value}`, "GET", null);
+          article.value = res1.find((article2) => article2.articleId === articleId);
+          uni.showToast({
+            title: "点赞成功"
+          });
+        }
+      };
+      const unlike = async (articleId) => {
+        const res = await request(`/likes/unlike?articleId=${articleId}&userId=${otherId.value}`, "PUT", null);
+        if (res.data.code === 200) {
+          const res1 = await requestPromise(`/article/queryArticleByUserId?userId=${otherId.value}`, "GET", null);
+          article.value = res1.find((article2) => article2.articleId === articleId);
+          uni.showToast({
+            title: "点赞成功"
+          });
+        }
+      };
+      const deleteByArticleId = (id) => {
+        uni.showModal({
+          title: "温馨提示",
+          content: "确认删除该动态吗",
+          success: async function(res) {
+            if (res.confirm) {
+              const res2 = await request(
+                `/article/deleteArticleByArticleId?articleId=${id}`,
+                "DELETE",
+                null
+              );
+              if (res2.data.code === 200) {
+                uni.navigateBack();
+                uni.showToast({
+                  title: "删除成功"
+                });
+              }
+            }
+          }
+        });
+      };
+      const __returned__ = { get role() {
+        return role;
+      }, set role(v2) {
+        role = v2;
+      }, get permission() {
+        return permission;
+      }, set permission(v2) {
+        permission = v2;
+      }, get article() {
+        return article;
+      }, set article(v2) {
+        article = v2;
+      }, get myId() {
+        return myId;
+      }, set myId(v2) {
+        myId = v2;
+      }, get otherId() {
+        return otherId;
+      }, set otherId(v2) {
+        otherId = v2;
+      }, get content() {
+        return content2;
+      }, set content(v2) {
+        content2 = v2;
+      }, deleteComment, publishComment, isLike: isLike2, like, unlike, deleteByArticleId, get onLoad() {
+        return onLoad;
+      }, get relativeTime() {
+        return relativeTime;
+      }, computed: vue.computed, ref: vue.ref, get request() {
+        return request;
+      }, get requestPromise() {
+        return requestPromise;
+      }, get toOtherPage() {
+        return toOtherPage;
+      } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   };
   function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.createCommentVNode(` <view class="article-detail">\r
-		<view class="article">\r
-			<view class="userInfo">\r
-				<view class="avatar">\r
-					<image :src="article.publishUser.userAvatar" mode=""></image>\r
-				</view>\r
-				<view class="right">\r
-					<view class="top">\r
-						<text>{{ article.publishUser.userName }}</text>\r
-						<van-button v-if="permission === 'read'"\r
-							style="width: 40px;background-color: #FEE802;border: none;color: black;" type="primary"\r
-							size="mini">关注</van-button>\r
-						<uni-icons v-else type="trash" size="25" @click="deleteByArticleId(article.articleId)"></uni-icons>\r
-					</view>\r
-					<view class="bottom">\r
-						<text>{{ formatDate(article.createTime) }}</text>\r
-					</view>\r
-				</view>\r
-			</view>\r
-			<view class="text">\r
-				<text>{{ article.articleContent }}</text>\r
-			</view>\r
-			<view class="image">\r
-				<template v-for="(photo, index) in JSON.parse(article.articlePhotos)">\r
-					<view class="photo" @click.stop="toOtherPage('image', photo, 'photo')">\r
-						<image :src="photo" mode=""></image>\r
-					</view>\r
-				</template>\r
-			</view>\r
-			<view class="function">\r
-				<uni-icons v-if="isLike(article.articleId, user.userId)" type="hand-up-filled" color="red" size="25"\r
-					@click="unlike(article.articleId, user.userId)"></uni-icons>\r
-				<uni-icons v-else type="hand-up" size="25" @click="like(article.articleId, user.userId)"></uni-icons>\r
-				<text>{{ article.like.count ?? 0 }}</text>\r
-				<uni-icons type="chat" size="25"></uni-icons>\r
-				<text>{{ article.comment.count ?? 0 }}</text>\r
-			</view>\r
-		</view>\r
-		<view class="input">\r
-			<uni-easyinput class="uni-mt-5" v-model="content" trim="all" placeholder="请输入内容"></uni-easyinput>\r
-			<text @click="publishComment(article.articleId)">发送</text>\r
-		</view>\r
-		<view class="comment">\r
-			<template v-for="(one, index) in article.comment.articleUserVOList">\r
-				<uni-list-chat :title="one.userName" :avatar="one.userAvatar" :note="article.comment.commentList[index]"\r
-					badge-positon="left">\r
-					<view class="chat-custom-right">\r
-						<uni-icons v-if="one.userId === user.userId" type="trash" color="#999" size="18" @click="deleteComment(article.articleId, article.comment.commentId[index])"></uni-icons>\r
-					</view>\r
-					<text style="font-size: 12px;">{{ relativeTime(article.comment.time[index], 'other') }}</text>\r
-				</uni-list-chat>\r
-			</template>\r
-		</view>\r
-	</view> `);
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
+    const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
+    const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_2);
+    return vue.openBlock(), vue.createElementBlock("view", { class: "article-detail" }, [
+      vue.createElementVNode("view", { class: "article" }, [
+        vue.createElementVNode("view", { class: "userInfo" }, [
+          vue.createElementVNode("view", {
+            class: "avatar",
+            onClick: _cache[0] || (_cache[0] = ($event) => $setup.toOtherPage("myIndex", $setup.role, $setup.permission, $setup.article.publishUser.userId))
+          }, [
+            vue.createElementVNode("image", {
+              src: $setup.article.publishUser.userAvatar,
+              mode: ""
+            }, null, 8, ["src"])
+          ]),
+          vue.createElementVNode("view", { class: "right" }, [
+            vue.createElementVNode("view", { class: "top" }, [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString($setup.article.publishUser.userName),
+                1
+                /* TEXT */
+              ),
+              $setup.permission === "update" ? (vue.openBlock(), vue.createBlock(_component_uni_icons, {
+                key: 0,
+                type: "trash",
+                size: "25",
+                onClick: _cache[1] || (_cache[1] = ($event) => $setup.deleteByArticleId($setup.article.articleId))
+              })) : vue.createCommentVNode("v-if", true)
+            ]),
+            vue.createElementVNode("view", { class: "bottom" }, [
+              vue.createElementVNode(
+                "text",
+                null,
+                vue.toDisplayString($setup.relativeTime($setup.article.createTime, "other")),
+                1
+                /* TEXT */
+              )
+            ])
+          ])
+        ]),
+        vue.createElementVNode("view", { class: "text" }, [
+          vue.createElementVNode(
+            "text",
+            null,
+            vue.toDisplayString($setup.article.articleContent),
+            1
+            /* TEXT */
+          )
+        ]),
+        vue.createElementVNode("view", { class: "image" }, [
+          (vue.openBlock(true), vue.createElementBlock(
+            vue.Fragment,
+            null,
+            vue.renderList(JSON.parse($setup.article.articlePhotos), (photo, index) => {
+              return vue.openBlock(), vue.createElementBlock("view", {
+                class: "photo",
+                onClick: ($event) => $setup.toOtherPage("image", $setup.role, $setup.permission, photo, "photo")
+              }, [
+                vue.createElementVNode("image", {
+                  src: photo,
+                  mode: ""
+                }, null, 8, ["src"])
+              ], 8, ["onClick"]);
+            }),
+            256
+            /* UNKEYED_FRAGMENT */
+          ))
+        ]),
+        vue.createElementVNode("view", { class: "function" }, [
+          $setup.isLike($setup.article.articleId, $setup.myId) ? (vue.openBlock(), vue.createBlock(_component_uni_icons, {
+            key: 0,
+            type: "hand-up-filled",
+            color: "red",
+            size: "25",
+            onClick: _cache[2] || (_cache[2] = ($event) => $setup.unlike($setup.article.articleId))
+          })) : (vue.openBlock(), vue.createBlock(_component_uni_icons, {
+            key: 1,
+            type: "hand-up",
+            size: "25",
+            onClick: _cache[3] || (_cache[3] = ($event) => $setup.like($setup.article.articleId))
+          })),
+          vue.createElementVNode(
+            "text",
+            null,
+            vue.toDisplayString($setup.article.like.count ?? 0),
+            1
+            /* TEXT */
+          ),
+          vue.createVNode(_component_uni_icons, {
+            type: "chat",
+            size: "25"
+          }),
+          vue.createElementVNode(
+            "text",
+            null,
+            vue.toDisplayString($setup.article.comment.count ?? 0),
+            1
+            /* TEXT */
+          )
+        ])
+      ]),
+      vue.createElementVNode("view", { class: "input" }, [
+        vue.createVNode(_component_uni_easyinput, {
+          class: "uni-mt-5",
+          modelValue: $setup.content,
+          "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => $setup.content = $event),
+          trim: "all",
+          placeholder: "请输入内容"
+        }, null, 8, ["modelValue"]),
+        vue.createElementVNode("text", {
+          onClick: _cache[5] || (_cache[5] = ($event) => $setup.publishComment($setup.article.articleId))
+        }, "发送")
+      ]),
+      vue.createElementVNode("view", { class: "comment" }, [
+        (vue.openBlock(true), vue.createElementBlock(
+          vue.Fragment,
+          null,
+          vue.renderList($setup.article.comment.articleUserVOList, (one, index) => {
+            return vue.openBlock(), vue.createBlock(_component_uni_list_chat, {
+              title: one.userName,
+              avatar: one.userAvatar,
+              note: $setup.article.comment.commentList[index],
+              "badge-positon": "left"
+            }, {
+              default: vue.withCtx(() => [
+                vue.createElementVNode("view", { class: "chat-custom-right" }, [
+                  vue.createVNode(_component_uni_icons, {
+                    type: "trash",
+                    color: "#999",
+                    size: "18",
+                    onClick: ($event) => $setup.deleteComment($setup.article.articleId, $setup.article.comment.commentId[index])
+                  }, null, 8, ["onClick"])
+                ]),
+                vue.createElementVNode(
+                  "text",
+                  { style: { "font-size": "12px" } },
+                  vue.toDisplayString($setup.relativeTime($setup.article.comment.time[index], "other")),
+                  1
+                  /* TEXT */
+                )
+              ]),
+              _: 2
+              /* DYNAMIC */
+            }, 1032, ["title", "avatar", "note"]);
+          }),
+          256
+          /* UNKEYED_FRAGMENT */
+        ))
+      ])
+    ]);
   }
   const PagesArticleArticle = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-33268ad9"], ["__file", "E:/code/design/client/CampusMarket/pages/article/article.vue"]]);
   __definePage("pages/login/login", PagesLoginLogin);

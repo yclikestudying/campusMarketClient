@@ -81,12 +81,16 @@ export const getUserInfo = async (url) => {
 export const toOtherPage = (name, role, permission, param, type) => {
 	const routes = {
 		"info": `/pages/my/info/info?role=${role}&permission=${permission}`,
-		"image": `/pages/image/image?role=${role}&permission=${permission}&type=${type}`
-		// "article": `/pages/article/article?role=${role.value}&permission=${permission.value}&articleId=${param}`
+		"image": `/pages/image/image?role=${role}&permission=${permission}&type=${type}`,
+		"article": `/pages/article/article?role=${role}&permission=${permission}`
 	}
 
 	if (name === 'image') {
 		uni.setStorageSync("image", param)
+	}
+	
+	if (name === 'article') {
+		uni.setStorageSync("article", param)
 	}
 
 	const url = routes[`${name}`]

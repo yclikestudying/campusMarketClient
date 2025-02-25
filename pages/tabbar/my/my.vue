@@ -207,6 +207,7 @@
 				background-color: #ffffff;
 				display: flex;
 				border-radius: 10px;
+				overflow: hidden;
 
 				.data-item {
 					width: 25%;
