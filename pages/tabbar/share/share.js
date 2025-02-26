@@ -1,8 +1,26 @@
 import {
-	request
+	request,
+	requestPromise
 } from "/pages/common/util/request.js"
 
-// 获取关注用户的动态
-export const getAttentionArticle = async (url) => {
-	return await request(url, "GET", null)
+// 去到其他页面
+export const toOtherPage = (name, role, permission, param, type) => {
+	const routes = {
+		"image": `/pages/image/image?role=${role}&permission=${permission}&type=${type}`,
+		"myIndex": `/pages/my/myIndex/myIndex?role=${role}&permission=${permission}&userId=${param}`,
+		"article": `/pages/article/article?role=${role}&permission=${permission}`
+	}
+
+	if (name === 'image') {
+		uni.setStorageSync("image", param)
+	}
+	
+	if (name === 'article') {
+		uni.setStorageSync("article", param)
+	}
+
+	const url = routes[`${name}`]
+	uni.navigateTo({
+		url: url
+	})
 }

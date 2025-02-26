@@ -86,24 +86,12 @@
 	let fans = ref(0); // 粉丝
 	let isLoading = ref(false); // 是否加载
 
-	onShow(() => {
+	onLoad(async (e) => {
 		// 本地缓存获取用户信息
 		const user = uni.getStorageSync("user")
 		userAvatar.value = user.userAvatar
 		userName.value = user.userName
 		isAdmin.value = user.isAdmin
-		fetch()
-
-	})
-
-	// 下拉刷新
-	onPullDownRefresh(() => {
-		fetch()
-		uni.stopPullDownRefresh()
-	})
-
-	// 并发请求
-	const fetch = async () => {
 		try {
 			isLoading.value = true
 			const [res1, res2, res3, res4] = await Promise.all([
@@ -121,7 +109,24 @@
 		} finally {
 			isLoading.value = false
 		}
-	}
+	})
+
+	onShow(async () => {
+		try {
+			const [res1, res2, res3, res4] = await Promise.all([
+				getArticle(),
+				getAttention(),
+				getFans(),
+				getAttentionFans()
+			])
+			article.value = res1
+			attention.value = res2
+			fans.value = res3
+			attentionFans.value = res4
+		} catch (err) {
+			console.log(err)
+		}
+	})
 </script>
 
 <style lang="less" scoped>

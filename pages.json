@@ -54,10 +54,7 @@
 				"app-plus": {
 					"bounce": "none",
 					"scrollIndicator": "none",
-					"titleNView": false,
-					"pullToRefresh": {
-						"support": true
-					}
+					"titleNView": false
 				}
 			}
 		},
