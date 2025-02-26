@@ -1,0 +1,18 @@
+.setting[data-v-1c9f95e0] {
+  width: 100vw;
+  height: 100vh;
+}
+.setting .content[data-v-1c9f95e0] {
+  width: 100%;
+  height: calc(100% - 50px);
+}
+.setting .logout[data-v-1c9f95e0] {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.setting .logout uni-text[data-v-1c9f95e0] {
+  font-size: 18px;
+}

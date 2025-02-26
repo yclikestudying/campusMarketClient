@@ -1,0 +1,20 @@
+.image[data-v-fa36ddbe] {
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.image uni-image[data-v-fa36ddbe] {
+  width: 100%;
+}
+.image .upload[data-v-fa36ddbe] {
+  position: relative;
+  top: 10px;
+  width: 115px;
+}
+.image .upload .button[data-v-fa36ddbe] {
+  width: 100%;
+}
