@@ -1,7 +1,3 @@
-import {
-	request,
-	requestPromise
-} from "/pages/common/util/request.js"
 
 // 去到其他页面
 export const toOtherPage = (name, role, permission, param, type) => {

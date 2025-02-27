@@ -18,7 +18,7 @@
 		</view>
 		<scroll-view scroll-y="true" v-else class="user">
 			<template v-for="(user, index) in users" :key="user.userId">
-				<uni-list-chat clickable :title="user.userName" :avatar="user.userAvatar" :note="user.userProfile"
+				<uni-list-chat clickable :title="user.userName" :avatar="user.userAvatar" :note="user.userProfile ?? ''"
 					@click="onClick('myIndex', user.userId)"></uni-list-chat>
 			</template>
 		</scroll-view>
@@ -35,6 +35,7 @@
 	import {
 		request
 	} from "/pages/common/util/request.js"
+	import { searchUser } from "/pages/common/util/api.js"
 
 	// 数据
 	let content = ref("");
@@ -58,7 +59,7 @@
 		}
 		isLoading.value = true
 		try {
-			const res = await request(`/userInfo/queryLikeUser?keyword=${content.value}`, "GET", null)
+			const res = await searchUser(content.value)
 			if (res.data.code === 200) {
 				users.value = res.data.data
 				if (users.value.length === 0) {

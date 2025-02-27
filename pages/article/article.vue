@@ -27,9 +27,9 @@
 				</template>
 			</view>
 			<view class="function">
-				<uni-icons v-if="isLike(article.articleId, myId)" type="hand-up-filled" color="red" size="25"
-					@click="unlike(article.articleId)"></uni-icons>
-				<uni-icons v-else type="hand-up" size="25" @click="like(article.articleId)"></uni-icons>
+				<uni-icons v-if="isLike(article, myId)" type="hand-up-filled" color="red" size="25"
+					@click="onUnlike(article.articleId)"></uni-icons>
+				<uni-icons v-else type="hand-up" size="25" @click="onLike(article.articleId)"></uni-icons>
 				<text>{{ article.like.count ?? 0 }}</text>
 				<uni-icons type="chat" size="25"></uni-icons>
 				<text>{{ article.comment.count ?? 0 }}</text>
@@ -72,6 +72,12 @@
 	import {
 		toOtherPage
 	} from "./article.js"
+	import {
+		isLike,
+		like,
+		unlike,
+		deleteArticle
+	} from "/pages/common/util/api.js"
 
 	// 数据
 	let role = ref('')
@@ -80,6 +86,11 @@
 	let myId = ref(uni.getStorageSync("user").userId); // 自己的id
 	let otherId = ref(article.value.publishUser.userId) // 动态发表用户的id
 	let content = ref('')
+	let myInfo = ref({
+		userId: uni.getStorageSync("user").userId,
+		userAvatar: uni.getStorageSync("user").userAvatar,
+		userName: uni.getStorageSync("user").userName
+	})
 
 	onLoad((e) => {
 		role.value = e.role
@@ -102,7 +113,8 @@
 						uni.showToast({
 							title: "删除成功"
 						})
-						uni.$emit("attentionUserArticle", article.value)
+						// 更新动态缓存
+						uni.$emit("updateArticles", article.value)
 					}
 				}
 			}
@@ -124,7 +136,8 @@
 				uni.showToast({
 					title: "发表成功"
 				})
-				uni.$emit("attentionUserArticle", article.value)
+				// 更新动态缓存
+				uni.$emit("updateArticles", article.value)
 			}
 		} else {
 			uni.showToast({
@@ -132,61 +145,57 @@
 			})
 		}
 	}
-
-	// 判断自己是否点赞别人的动态
-	const isLike = (articleId, id) => {
-		if (article.value.like.articleUserVOList) {
-			for (let user of article.value.like.articleUserVOList) {
-				if (user.userId === id) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 	
 	// 点赞动态
-	const like = async (articleId) => {
-		const res = await request(`/likes/like?articleId=${articleId}&userId=${otherId.value}`, "PUT", null)
+	const onLike = async (articleId) => {
+		const res = await like(articleId, otherId.value)
 		if (res.data.code === 200) {
-			const res1 = await requestPromise(`/article/queryArticleByUserId?userId=${otherId.value}`, "GET", null)		
-			article.value = res1.find(article => article.articleId === articleId)
+			if (article.value.articleId === articleId) {
+				if (!article.value.like.articleUserVOList) {
+					article.value.like.articleUserVOList = []
+				}
+				article.value.like.articleUserVOList.push(myInfo.value)
+				article.value.like.count++
+			}
 			uni.showToast({
 				title: "点赞成功"
 			})
-			uni.$emit("attentionUserArticle", article.value)
+			// 更新动态缓存
+			uni.$emit("updateArticles", article.value)
 		}
 	}
 	
 	// 取消点赞动态
-	const unlike = async (articleId) => {
-		const res = await request(`/likes/unlike?articleId=${articleId}&userId=${otherId.value}`, "PUT", null)
+	const onUnlike = async (articleId) => {
+		const res = await unlike(articleId, otherId.value)
 		if (res.data.code === 200) {
-			const res1 = await requestPromise(`/article/queryArticleByUserId?userId=${otherId.value}`, "GET", null)		
-			article.value = res1.find(article => article.articleId === articleId)
+			if (article.value.articleId === articleId) {
+				article.value.like.articleUserVOList = article.value.like.articleUserVOList.filter(user => user.userId !== myId.value)
+				article.value.like.count--
+			}
 			uni.showToast({
-				title: "点赞成功"
+				title: "取消成功"
 			})
-			uni.$emit("attentionUserArticle", article.value)
+			// 更新动态缓存
+			uni.$emit("updateArticles", article.value)
 		}
 	}
 
 	// 删除动态
-	const deleteByArticleId = (id) => {
+	const deleteByArticleId = (articleId) => {
 		uni.showModal({
 			title: '温馨提示',
 			content: '确认删除该动态吗',
 			success: async function(res) {
 				if (res.confirm) {
-					const res = await request(`/article/deleteArticleByArticleId?articleId=${id}`,
-						"DELETE", null)
-					if (res.data.code === 200) {
+					const res1 = await deleteArticle(articleId)
+					if (res1.data.code === 200) {
+						uni.$emit("deleteArticle", articleId)
 						uni.navigateBack()
 						uni.showToast({
 							title: "删除成功"
 						})
-
-					}
+					}			
 				}
 			}
 		});

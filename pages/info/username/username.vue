@@ -27,5 +27,12 @@
 </script>
 
 <style lang="less" scoped>
-	@import url('./username.css');
+	.username {
+		width: 100vw;
+		height: 100vh;
+	
+		.content {
+			padding: 10px;
+		}
+	}
 </style>

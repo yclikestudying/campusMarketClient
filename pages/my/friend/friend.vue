@@ -4,7 +4,7 @@
 			<van-empty v-if="users === null" description="这里空空如也" />
 			<template v-else v-for="(user, index) in users" :key="user.userId">
 				<uni-list-chat clickable :title="user.userName" :avatar="user.userAvatar"
-					:note="user.userProfile" @click="onClick(user.userId)"></uni-list-chat>
+					:note="user.userProfile ?? ''" @click="onClick(user.userId)"></uni-list-chat>
 			</template>
 		</scroll-view>
 	</view>

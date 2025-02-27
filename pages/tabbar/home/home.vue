@@ -43,7 +43,7 @@
 						</view>
 					</view>
 				</view>
-				<view class="search" @click="toOtherPage('搜索')">
+				<view class="search" @click="toOtherPage('search')">
 					<image src="/static/home/搜索.svg" mode=""></image>
 				</view>
 			</view>
@@ -51,40 +51,47 @@
 				<swiper class="swiper" :current="currentMenu" @change="onSwiperChange">
 					<swiper-item>
 						<view class="swiper-item">
-							<scroll-view :scroll-y="isScroll" class="page">
-								<template v-for="item in 10">
+							<scroll-view :scroll-y="isScroll" class="page" :refresher-enabled="articleEnabled"
+								:refresher-triggered="isRefreshing" @refresherpulling="onPulling"
+								@refresherrefresh="onRefresh" @refresherrestore="onRestore" @refresherabort="onAbort">
+								<SmallLoading v-if="isLoading"></SmallLoading>
+								<van-empty v-if="articles?.length === 0" description="这里空空如也" />
+								<template v-else v-for="(article, index) in articles" :key="article">
 									<view class="article">
 										<view class="userInfo">
-											<view class="avatar">
-												<image src="/static/初始化头像.jpg" mode=""></image>
+											<view class="avatar"
+												@click="toOtherPage('myIndex', 'other', 'read', article.publishUser.userId)">
+												<image :src="article.publishUser.userAvatar" mode=""></image>
 											</view>
 											<view class="right">
 												<view class="top">
-													<text>名称</text>
-													<van-button
-														style="width: 40px;background-color: #FEE802;border: none;color: black;"
-														type="primary" size="mini">关注</van-button>
+													<text>{{ article.publishUser.userName }}</text>
 												</view>
 												<view class="bottom">
-													<text>时间</text>
+													<text>{{ relativeTime(article.createTime, 'other') }}</text>
 												</view>
 											</view>
 										</view>
-										<view class="text">
-											<text>这是文本</text>
+										<view class="text" @click="toOtherPage('article', role, permission, article)">
+											<text>{{ article.articleContent }}</text>
 										</view>
-										<view class="image">
-											<template v-for="item in 4">
-												<view class="photo">
-													<image src="/static/初始化头像.jpg" mode=""></image>
+										<view class="image" @click="toOtherPage('article', role, permission, article)">
+											<template v-for="(photo, index) in JSON.parse(article.articlePhotos)">
+												<view class="photo"
+													@click.stop="toOtherPage('image', role, permission, photo, 'photo')">
+													<image :src="photo" mode=""></image>
 												</view>
 											</template>
 										</view>
 										<view class="function">
-											<uni-icons type="hand-up" size="25"></uni-icons>
-											<text>10</text>
+											<uni-icons v-if="isLikeInList(articles, article.articleId, myId)"
+												type="hand-up-filled" color="red" size="25"
+												@click="onUnLike(article.articleId, article.publishUser.userId)"></uni-icons>
+											<uni-icons v-else type="hand-up" size="25"
+												@click="onLike(article.articleId, article.publishUser.userId)"></uni-icons>
+											<text>{{ article.like.count || 0 }}</text>
 											<uni-icons type="chat" size="25"></uni-icons>
-											<text>99+</text>
+											<text>{{ article.comment.count || 0 }}</text>
 										</view>
 									</view>
 								</template>
@@ -111,27 +118,213 @@
 
 <script setup>
 	import {
-		opacity,
-		isScroll,
-		currentMenu,
-		background,
-		isExtend,
-		horizontal,
-		vertical,
-		direction,
-		content,
-		pattern,
-		setCurrentMenu,
-		onSwiperChange,
-		scroll,
-		toOtherPage,
-		fabClick,
-		trigger
-	} from './home.js';
-	import {
 		onShow,
 		onLoad
 	} from "@dcloudio/uni-app"
+	import {
+		ref,
+		computed
+	} from "vue"
+	import {
+		getSchoolArticle,
+		isLikeInList,
+		like,
+		unlike,
+		likeAfter,
+		unlikeAfter
+	} from "/pages/common/util/api.js"
+	import {
+		relativeTime
+	} from "/pages/common/util/common.js"
+	import {
+		toOtherPage
+	} from "./home.js"
+
+	/**
+	 * 数据
+	 */
+	let opacity = ref(0)
+	let isScroll = ref(false)
+	let currentMenu = ref(0) // 菜单
+	const background = computed(() => {
+		return {
+			opacity: `${opacity.value}`
+		}
+	})
+	let isExtend = ref(false)
+	let horizontal = ref('right')
+	let vertical = ref('bottom')
+	let direction = ref('horizontal')
+	let pattern = ref({
+		color: '#7A7E83',
+		backgroundColor: '#fff',
+		selectedColor: '#007AFF',
+		buttonColor: '#FEE802',
+		iconColor: '#fff'
+	})
+	let content = ref([{
+			iconPath: '/static/home/校园圈子.png',
+			text: '校园动态',
+			active: false
+		},
+		{
+			iconPath: '/static/home/商品.png',
+			text: '二手集市',
+			active: false
+		},
+		{
+			iconPath: '/static/home/快递.png',
+			text: '快递代取',
+			active: false
+		}
+	])
+	let articles = ref(null); // 动态集合
+	let isLoading = ref(false); // 是否开启加载动画
+	let myId = ref(uni.getStorageSync("user").userId); // 我的id
+	let myInfo = ref({
+		userId: uni.getStorageSync("user").userId,
+		userAvatar: uni.getStorageSync("user").userAvatar,
+		userName: uni.getStorageSync("user").userName
+	})
+	let isRefreshing = ref(false); // 是否开启下拉刷新动画
+	let articleEnabled = ref(true); // 是否允许下拉刷新
+
+	onLoad(async (e) => {
+		try {
+			isLoading.value = true
+			articles.value = await getSchoolArticle()
+		} catch (err) {
+			console.log(err)
+		} finally {
+			isLoading.value = false
+		}
+	})
+
+	// 点赞
+	const onLike = async (articleId, publishUserId) => {
+		const res = await like(articleId, publishUserId)
+		if (res.data.code === 200) {
+			likeAfter(articles.value, articleId, myInfo.value)
+		}
+	}
+
+	// 取消点赞
+	const onUnLike = async (articleId, otherId) => {
+		const res = await unlike(articleId, otherId)
+		if (res.data.code === 200) {
+			unlikeAfter(articles.value, articleId, myInfo.value.userId)
+		}
+	}
+
+
+	// 点击浮动图标
+	const fabClick = () => {
+		isExtend.value = true
+	}
+
+	// 点击浮动图标里面的选项
+	const trigger = (event) => {
+		const routes = {
+			0: "/pages/home/schoolShare/schoolShare",
+			1: "/pages/home/goodsMarket/goodsMarket",
+			2: "/pages/home/express/express"
+		}
+		const url = routes[event.index]
+
+		uni.navigateTo({
+			url: url
+		})
+	};
+
+	// 点击设置新的菜单
+	const setCurrentMenu = (index) => {
+		currentMenu.value = index
+	}
+
+	// 滑动设置新的菜单
+	const onSwiperChange = (e) => {
+		currentMenu.value = e.detail.current
+	}
+
+
+	// 整个页面的滑动的监听事件
+	const scroll = (e) => {
+		if (e.detail.scrollTop === 0) {
+			opacity.value = 0
+			isScroll.value = false
+			articleEnabled.value = true
+		}
+		if (e.detail.scrollTop > 0 && e.detail.scrollTop < 30) {
+			opacity.value = 0.2
+			isScroll.value = false
+			articleEnabled.value = false;
+		}
+		if (e.detail.scrollTop > 30 && e.detail.scrollTop < 60) {
+			opacity.value = 0.4
+			isScroll.value = false
+			articleEnabled.value = false;
+		}
+		if (e.detail.scrollTop > 60 && e.detail.scrollTop < 90) {
+			opacity.value = 0.6
+			isScroll.value = false
+			articleEnabled.value = false;
+		}
+		if (e.detail.scrollTop > 90 && e.detail.scrollTop < 120) {
+			opacity.value = 0.8
+			isScroll.value = false
+			articleEnabled.value = false;
+		}
+		if (e.detail.scrollTop > 120 && e.detail.scrollTop < 130) {
+			opacity.value = 1
+			isScroll.value = false
+			articleEnabled.value = false;
+		}
+		if (e.detail.scrollTop >= 130) {
+			opacity.value = 1
+			isScroll.value = true
+			articleEnabled.value = false;
+		}
+	}
+
+	// 下拉刷新
+	const onRefresh = () => {
+		if (articleEnabled.value) {
+			isRefreshing.value = true; // 开启刷新状态
+			setTimeout(async () => {
+				try {
+					articles.value = await getSchoolArticle()
+				} catch (err) {
+					console.log(err);
+				} finally {
+					isRefreshing.value = false; // 关闭刷新状态
+				}
+			}, 1000);
+		}
+	};
+
+	const onRestore = () => {
+		isRefreshing.value = false; // 恢复默认状态
+	};
+
+	const onAbort = () => {
+		isRefreshing.value = false; // 恢复默认状态
+	};
+
+	uni.$on("updateArticles", (article) => {
+		articles.value.forEach(item => {
+			if (item.articleId === article.articleId) {
+				// 点赞相关
+				item.like.articleUserVOList = article.like.articleUserVOList
+				item.like.count = article.like.count
+				// 评论相关
+				item.comment.articleUserVOList = article.comment.articleUserVOList
+				item.comment.count = article.comment.count
+				item.comment.commentList = article.comment.commentList
+				item.comment.commentId = article.comment.commentId
+				item.comment.time = article.comment.time
+			}
+		})
+	})
 </script>
 
 <style lang="less" scoped>

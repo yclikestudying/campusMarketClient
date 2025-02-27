@@ -136,10 +136,12 @@
 		relativeTime
 	} from "/pages/common/util/common.js"
 	import {
-		unlike,
-		like,
+		getAttentionArticle,
 		isLikeInList,
-		getAttentionArticle
+		like,
+		unlike,
+		likeAfter,
+		unlikeAfter
 	} from "/pages/common/util/api.js"
 
 	// 数据
@@ -166,38 +168,18 @@
 	})
 
 	// 点赞动态
-	const onLike = async (articleId, otherId) => {
-		const res = await like(articleId, otherId)
+	const onLike = async (articleId, publishUserId) => {
+		const res = await like(articleId, publishUserId)
 		if (res.data.code === 200) {
-			articles.value.forEach(article => {
-				if (article.articleId === articleId) {
-					if (!article.like.articleUserVOList) {
-						article.like.articleUserVOList = []
-					}
-					article.like.articleUserVOList.push(myInfo.value)
-					article.like.count++
-				}
-			})
-			uni.showToast({
-				title: "点赞成功"
-			})
+			likeAfter(articles.value, articleId, myInfo.value)
 		}
 	}
 
 	// 取消点赞
-	const onUnLike = async (articleId, otherId) => {
-		const res = await unlike(articleId, otherId)
+	const onUnLike = async (articleId, publishUserId) => {
+		const res = await unlike(articleId, publishUserId)
 		if (res.data.code === 200) {
-			articles.value.forEach(article => {
-				if (article.articleId === articleId) {
-					article.like.articleUserVOList = article.like.articleUserVOList.filter(user => user
-						.userId === otherId)
-					article.like.count--
-				}
-			})
-			uni.showToast({
-				title: "取消成功"
-			})
+			unlikeAfter(articles.value, articleId, myId.value)
 		}
 	}
 
@@ -211,6 +193,7 @@
 		currentOption.value = event.detail.current
 	}
 
+	// 下拉刷新
 	const onRefresh = () => {
 		 isRefreshing.value = true; // 开启刷新状态
 		  setTimeout(async () => {
@@ -232,7 +215,7 @@
 		isRefreshing.value = false; // 恢复默认状态
 	};
 	
-	uni.$on("attentionUserArticle", (article) => {
+	uni.$on("updateArticles", (article) => {
 		articles.value.forEach(item => {
 			if (item.articleId === article.articleId) {
 				// 点赞相关

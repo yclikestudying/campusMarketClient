@@ -137,11 +137,11 @@
 											</template>
 										</view>
 										<view class="function">
-											<uni-icons v-if="isLike(articles, article.articleId, myId)"
+											<uni-icons v-if="isLikeInList(articles, article.articleId, myId)"
 												type="hand-up-filled" color="red" size="25"
-												@click="unlike(article.articleId)"></uni-icons>
+												@click="onUnlike(article.articleId, article.publishUser.userId)"></uni-icons>
 											<uni-icons v-else type="hand-up" size="25"
-												@click="like(article.articleId)"></uni-icons>
+												@click="onLike(article.articleId, article.publishUser.userId)"></uni-icons>
 											<text>{{ article.like.count || 0 }}</text>
 											<uni-icons type="chat" size="25"></uni-icons>
 											<text>{{ article.comment.count || 0 }}</text>
@@ -188,19 +188,26 @@
 		userInfoProgress
 	} from "../../common/util/common.js"
 	import {
+		toOtherPage,
+	} from './myIndex.js'
+	import {
 		getAttention,
 		getFans,
+		getUserArticle,
 		getUserInfo,
-		toOtherPage,
-		attentionUser,
-		isAttention,
-		unattentionUser,
-		getArticle,
-		isLike,
+		like,
+		likeAfter,
+		unlike,
+		unlikeAfter,
 		deleteArticle,
-		artilceLike,
-		unArticleLike
-	} from './myIndex.js'
+		deleteArticleAfter,
+		isLikeInList,
+		isAttention,
+		attentionUser,
+		unattentionUser,
+		attentionUserAfter,
+		unattentionUserAfter
+	} from "/pages/common/util/api.js"
 
 	// 数据
 	let role = ref(''); // 用户角色
@@ -211,35 +218,34 @@
 	let myId = ref(uni.getStorageSync("user").userId); // 我的id
 	let otherId = ref(null); // 进入其他用户主页时他们的id
 	let attentionList = ref(null); // 当前用户的关注
-	let fansList = ref(null); // 当前用户的粉丝
+	let fansList = ref([]); // 当前用户的粉丝
 	let articles = ref([]); // 动态
 	let isLoading = ref(false); // 是否开启加载动画
 	let isScroll = ref(false); // 滚动监听
+	let myInfo = ref({
+		userId: uni.getStorageSync("user").userId,
+		userAvatar: uni.getStorageSync("user").userAvatar,
+		userName: uni.getStorageSync("user").userName,
+		userProfile: uni.getStorageSync("user").userProfile
+	})
 
-	onLoad((e) => {
+	onLoad(async(e) => {
 		role.value = e.role
 		permission.value = e.permission
 		if (e.userId) {
 			// 说明进入了其他用户的主页
 			otherId.value = e.userId
 		}
-	})
-
-	onShow(async () => {
 		if (role.value === 'me') {
-			// 如果是自己进入主页，那么从本地缓存获取用户信息
-			user.value = uni.getStorageSync("user")
-			// 计算基本信息完善程度
-			progress.value = userInfoProgress()
 			try {
 				// 并发请求
 				const [res1, res2, res3] = await Promise.all([
 					// 获取关注数量
-					getAttention("/friend/attention"),
+					getAttention(null),
 					// 获取粉丝数量
-					getFans("/friend/fans"),
+					getFans(null),
 					// 获取用户动态信息
-					getArticle("/article/queryArticleByUserId")
+					getUserArticle(null)
 				])
 				attentionList.value = res1
 				fansList.value = res2
@@ -253,16 +259,16 @@
 			try {
 				const [res1, res2, res3, res4] = await Promise.all([
 					// 获取关注数量
-					getAttention(`/friend/attention?userId=${otherId.value}`),
+					getAttention(otherId.value),
 					// 获取粉丝数量
-					getFans(`/friend/fans?userId=${otherId.value}`),
+					getFans(otherId.value),
 					// 获取用户信息
-					getUserInfo(`/userInfo/getUserInfoByUserId?userId=${otherId.value}`),
+					getUserInfo(otherId.value),
 					// 获取用户动态信息
-					getArticle(`/article/queryArticleByUserId?userId=${otherId.value}`)
+					getUserArticle(otherId.value)
 				])
 				attentionList.value = res1
-				fansList.value = res2
+				fansList.value = res2 ?? []
 				user.value = res3
 				articles.value = res4
 				uni.setStorageSync("other", user.value)
@@ -272,52 +278,34 @@
 
 			}
 		}
+	})
 
-		// 设置title
-		uni.setNavigationBarTitle({
-			title: user.value.userName
-		})
+	onShow(async () => {
+		if (role.value === 'me') {
+			// 如果是自己进入主页，那么从本地缓存获取用户信息
+			user.value = uni.getStorageSync("user")
+			// 计算基本信息完善程度
+			progress.value = userInfoProgress()
+			// 设置title
+			uni.setNavigationBarTitle({
+				title: user.value.userName
+			})
+		}	
 	})
 
 	// 动态点赞
-	const like = async (articleId) => {
-		let url;
-		let id;
-		if (otherId.value) {
-			url = `/article/queryArticleByUserId?userId=${otherId.value}`
-			id = otherId.value
-		} else {
-			url = `/article/queryArticleByUserId`
-			id = myId.value
-		}
-		const res = await artilceLike(articleId, id)
+	const onLike = async (articleId, publishUserId) => {
+		const res = await like(articleId, publishUserId)
 		if (res.data.code === 200) {
-			const res1 = await getArticle(url)
-			articles.value = res1
-			uni.showToast({
-				title: "点赞成功"
-			})
+			likeAfter(articles.value, articleId, myInfo.value)
 		}
 	}
 
-	// 取消动态点赞
-	const unlike = async (articleId) => {
-		let url;
-		let id;
-		if (otherId.value) {
-			url = `/article/queryArticleByUserId?userId=${otherId.value}`
-			id = otherId.value
-		} else {
-			url = `/article/queryArticleByUserId`
-			id = myId.value
-		}
-		const res = await unArticleLike(articleId, id)
+	// 取消点赞
+	const onUnlike = async (articleId, publishUserId) => {
+		const res = await unlike(articleId, publishUserId)
 		if (res.data.code === 200) {
-			const res1 = await getArticle(url)
-			articles.value = res1
-			uni.showToast({
-				title: "取消成功"
-			})
+			unlikeAfter(articles.value, articleId, myId.value)
 		}
 	}
 
@@ -328,11 +316,9 @@
 			content: '确认删除该动态吗',
 			success: async function(res) {
 				if (res.confirm) {
-					const res = await deleteArticle(
-						`/article/deleteArticleByArticleId?articleId=${articleId}`)
-					if (res.data.code === 200) {
-						const res1 = await getArticle("/article/queryArticleByUserId")
-						articles.value = res1
+					const res1 = await deleteArticle(articleId)
+					if (res1.data.code === 200) {
+						articles.value = deleteArticleAfter(articles.value, articleId)
 						uni.showToast({
 							title: "删除成功"
 						})
@@ -344,31 +330,17 @@
 
 	// 关注
 	const attention = async () => {
-		const res = await attentionUser(`/friend/attentionUser?userId=${myId.value}&otherId=${otherId.value}`)
+		const res = await attentionUser(myId.value, otherId.value)
 		if (res.data.code === 200) {
-			uni.showToast({
-				title: "关注成功"
-			})
-			// 获取粉丝数量
-			const [res] = await Promise.all([
-				getFans(`/friend/fans?userId=${otherId.value}`)
-			])
-			fansList.value = res
+			attentionUserAfter(fansList.value, myInfo.value)
 		}
 	}
 
 	// 取消关注
 	const unattention = async () => {
-		const res = await unattentionUser(`/friend/unAttentionUser?userId=${myId.value}&otherId=${otherId.value}`)
+		const res = await unattentionUser(myId.value, otherId.value)
 		if (res.data.code === 200) {
-			uni.showToast({
-				title: "取消成功"
-			})
-			// 获取粉丝数量
-			const [res] = await Promise.all([
-				getFans(`/friend/fans?userId=${otherId.value}`)
-			])
-			fansList.value = res
+			fansList.value = unattentionUserAfter(fansList.value, myInfo.value)
 		}
 	}
 
@@ -386,6 +358,28 @@
 	const scroll = (e) => {
 		isScroll.value = e.detail.scrollTop > 325 ? true : false
 	}
+	
+	// 更新动态缓存
+	uni.$on("updateArticles", (article) => {
+		articles.value.forEach(item => {
+			if (item.articleId === article.articleId) {
+				// 点赞相关
+				item.like.articleUserVOList = article.like.articleUserVOList
+				item.like.count = article.like.count
+				// 评论相关
+				item.comment.articleUserVOList = article.comment.articleUserVOList
+				item.comment.count = article.comment.count
+				item.comment.commentList = article.comment.commentList
+				item.comment.commentId = article.comment.commentId
+				item.comment.time = article.comment.time
+			}
+		})
+	})
+	
+	// 删除动态之后更新缓存
+	uni.$on("deleteArticle", (articleId) => {
+		articles.value = articles.value.filter(article => article.articleId !== articleId)
+	})
 </script>
 <style lang="less" scoped>
 	.myIndex {
