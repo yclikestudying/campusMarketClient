@@ -10,10 +10,30 @@
 </template>
 
 <script setup>
+	import {
+		logout
+	} from "/pages/common/util/api.js"
+	
+	let userId = uni.getStorageSync("user").userId
+	let socket = getApp().globalData.sockets[`${userId}`];
+	
 	const toOtherPage = () => {
-		uni.reLaunch({
-			url: "/pages/login/login"
-		})
+		uni.showModal({
+			title: '温馨提示',
+			content: '确认退出吗',
+			success: async function(res) {
+				if (res.confirm) {
+					const res1 = await logout()
+					if (res1.data.code === 200) {
+						socket.close()
+						delete getApp().globalData.sockets[`${userId}`]
+						uni.reLaunch({
+							url: "/pages/login/login"
+						})
+					}
+				}
+			}
+		});
 	}
 </script>
 

@@ -42,7 +42,7 @@
 			<view class="function">
 				<van-cell title="隐私" icon="closed-eye" is-link>
 				</van-cell>
-				<van-cell title="访客" icon="eye-o" is-link>
+				<van-cell title="访客" icon="eye-o" :value="visitCount" is-link @click="toOtherPage('visit')">
 				</van-cell>
 				<van-cell title="邀请" icon="friends-o" is-link>
 				</van-cell>
@@ -75,6 +75,9 @@
 		onLoad,
 		onPullDownRefresh
 	} from "@dcloudio/uni-app"
+	import {
+		queryVisit
+	} from "/pages/common/util/api.js"
 
 	// 数据
 	let userAvatar = ref(''); // 用户头像
@@ -85,6 +88,7 @@
 	let attention = ref(0); // 关注
 	let fans = ref(0); // 粉丝
 	let isLoading = ref(false); // 是否加载
+	let visitCount = ref(null); // 访客数量
 
 	onLoad(async (e) => {
 		// 本地缓存获取用户信息
@@ -94,16 +98,19 @@
 		isAdmin.value = user.isAdmin
 		try {
 			isLoading.value = true
-			const [res1, res2, res3, res4] = await Promise.all([
+			const [res1, res2, res3, res4, res5] = await Promise.all([
 				getArticle(),
 				getAttention(),
 				getFans(),
-				getAttentionFans()
+				getAttentionFans(),
+				// 查询访客记录
+				queryVisit()
 			])
 			article.value = res1
 			attention.value = res2
 			fans.value = res3
 			attentionFans.value = res4
+			visitCount.value = res5 ? res5.length : ''
 		} catch (err) {
 			console.log(err)
 		} finally {

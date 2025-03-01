@@ -22,7 +22,7 @@
 							size="mini" @click="unattention">已关注</van-button>
 						<van-button v-else style="width: 40px;background-color: #FEE802;border: none;color: black;"
 							type="primary" size="mini" @click="attention">关注</van-button>
-						<uni-icons type="chat" size="30"></uni-icons>
+						<uni-icons type="chat" size="30" @click="toOtherPage('chat', 'me', 'update', {userId: user.userId, userAvatar: user.userAvatar, userName:user.userName})"></uni-icons>
 					</view>
 				</view>
 				<view class="name">
@@ -33,17 +33,17 @@
 				</view>
 				<view class="data">
 					<view class="data-item">
-						<text>{{ attentionList ? attentionList.length : 0 }}</text>
+						<text>{{ attentionList?.length ?? 0 }}</text>
 						<text>关注</text>
 					</view>
 					<view class="data-item">
-						<text>{{ fansList ? fansList.length : 0 }}</text>
+						<text>{{ fansList?.length ?? 0 }}</text>
 						<text>粉丝</text>
 					</view>
-					<view class="data-item">
+<!-- 					<view class="data-item">
 						<text>4</text>
 						<text>访客</text>
-					</view>
+					</view> -->
 				</view>
 				<view class="tag">
 					<text>标签:</text>
@@ -132,7 +132,7 @@
 											<template v-for="(photo, index) in JSON.parse(article.articlePhotos)">
 												<view class="photo"
 													@click.stop="toOtherPage('image', role, permission, photo, 'photo')">
-													<image :src="photo" mode=""></image>
+													<image lazy-load="true" :src="photo" mode=""></image>
 												</view>
 											</template>
 										</view>
@@ -142,9 +142,9 @@
 												@click="onUnlike(article.articleId, article.publishUser.userId)"></uni-icons>
 											<uni-icons v-else type="hand-up" size="25"
 												@click="onLike(article.articleId, article.publishUser.userId)"></uni-icons>
-											<text>{{ article.like.count || 0 }}</text>
+											<text>{{ article.like.count ?? 0 }}</text>
 											<uni-icons type="chat" size="25"></uni-icons>
-											<text>{{ article.comment.count || 0 }}</text>
+											<text>{{ article.comment.count ?? 0 }}</text>
 										</view>
 									</view>
 								</template>
@@ -206,7 +206,8 @@
 		attentionUser,
 		unattentionUser,
 		attentionUserAfter,
-		unattentionUserAfter
+		unattentionUserAfter,
+		visitLog
 	} from "/pages/common/util/api.js"
 
 	// 数据
@@ -228,6 +229,7 @@
 		userName: uni.getStorageSync("user").userName,
 		userProfile: uni.getStorageSync("user").userProfile
 	})
+	let socket = getApp().globalData.sockets[`${myId.value}`]; // websocket实例
 
 	onLoad(async(e) => {
 		role.value = e.role
@@ -248,8 +250,8 @@
 					getUserArticle(null)
 				])
 				attentionList.value = res1
-				fansList.value = res2
-				articles.value = res3
+				fansList.value = res2 ?? []
+				articles.value = res3 ?? []
 			} catch (err) {
 				console.log(err)
 			}
@@ -257,7 +259,7 @@
 			// 如果进入别的用户主页，那么根据id查询他的信息
 			// 并发请求
 			try {
-				const [res1, res2, res3, res4] = await Promise.all([
+				const [res1, res2, res3, res4, res5] = await Promise.all([
 					// 获取关注数量
 					getAttention(otherId.value),
 					// 获取粉丝数量
@@ -265,19 +267,25 @@
 					// 获取用户信息
 					getUserInfo(otherId.value),
 					// 获取用户动态信息
-					getUserArticle(otherId.value)
+					getUserArticle(otherId.value),
+					// 记录访客记录
+					visitLog(otherId.value)
 				])
 				attentionList.value = res1
 				fansList.value = res2 ?? []
 				user.value = res3
-				articles.value = res4
+				articles.value = res4 ?? []
 				uni.setStorageSync("other", user.value)
 			} catch (err) {
 				console.log(err)
-			} finally {
-
 			}
 		}
+		// 设置title
+		uni.setNavigationBarTitle({
+			title: user.value.userName
+		})
+		// 清除当前用户的id
+		socket.setOneByOne(null)
 	})
 
 	onShow(async () => {
@@ -286,10 +294,6 @@
 			user.value = uni.getStorageSync("user")
 			// 计算基本信息完善程度
 			progress.value = userInfoProgress()
-			// 设置title
-			uni.setNavigationBarTitle({
-				title: user.value.userName
-			})
 		}	
 	})
 

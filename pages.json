@@ -293,6 +293,7 @@
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
+					"softinputMode": "adjustPan",
 					"bounce": "none",
 					"scrollIndicator": "none",
 					"titleNView": {
@@ -318,10 +319,9 @@
 			}
 		},
 		{
-			"path" : "pages/image/image",
-			"style" : 
-			{
-				"navigationBarTitleText" : "图片查看",
+			"path": "pages/image/image",
+			"style": {
+				"navigationBarTitleText": "图片查看",
 				"animationType": "fade-in",
 				"animationDuration": 300,
 				"app-plus": {
@@ -332,10 +332,9 @@
 			}
 		},
 		{
-			"path" : "pages/article/article",
-			"style" : 
-			{
-				"navigationBarTitleText" : "动态详情",
+			"path": "pages/article/article",
+			"style": {
+				"navigationBarTitleText": "动态详情",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {

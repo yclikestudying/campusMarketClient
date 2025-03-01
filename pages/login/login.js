@@ -1,10 +1,11 @@
 import {
 	ref,
 	watch
-} from 'vue';
+} from 'vue'
 import {
 	request
 } from "/pages/common/util/request.js"
+import WebSocketClient from "/pages/common/util/socket.js"
 
 // 数据变量
 export let phoneNumber = ref('17823257046'); // 手机号码
@@ -44,6 +45,12 @@ export const onSubmit = async () => {
 				uni.setStorageSync("token", data.data.token)
 				// 用户信息存入本地缓存
 				uni.setStorageSync("user", data.data.user)
+				// 连接服务器
+				const socket = new WebSocketClient(data.data.user.userId)
+				socket.connect()
+				// 把这个实例存储到本地
+				const app = getApp()
+				app.globalData.sockets[`${data.data.user.userId}`] = socket
 				// 跳转到主页
 				uni.switchTab({
 					url: "/pages/tabbar/home/home"

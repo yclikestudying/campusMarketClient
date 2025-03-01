@@ -22,7 +22,7 @@
 			<view class="image">
 				<template v-for="(photo, index) in JSON.parse(article.articlePhotos)">
 					<view class="photo" @click="toOtherPage('image', role, permission, photo, 'photo')">
-						<image :src="photo" mode=""></image>
+						<image lazy-load="true" :src="photo" mode=""></image>
 					</view>
 				</template>
 			</view>

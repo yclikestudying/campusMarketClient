@@ -41,33 +41,38 @@ export const formatDate = (time) => {
 };
 
 /**
- * 聊天页面的时间展示
+ * 聊天页面的时间展示（仿腾讯 QQ，今天显示“今天 HH:mm”）
  */
 export function relativeTime(timeString, keyword) {
 	const date1 = new Date(formatDate(timeString)); // 传入的时间
 	const date2 = new Date(); // 当前时间
 	const diffMs = date2 - date1; // 时间差（毫秒）
 
-	const diffSeconds = Math.floor(diffMs / 1000); // 相差秒数
-	const diffMinutes = Math.floor(diffSeconds / 60); // 相差分钟数
-	const diffHours = Math.floor(diffMinutes / 60); // 相差小时数
-	const diffDays = Math.floor(diffHours / 24); // 相差天数
+	const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 相差天数
+
+	// 星期几的映射
+	const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 
 	let result;
 
-	if (diffSeconds < 60) {
-		result = '刚刚'; // 小于1分钟，显示“刚刚”
-	} else if (diffMinutes < 60) {
-		result = `${diffMinutes}分钟前`; // 小于1小时，显示“X分钟前”
-	} else if (diffHours < 24) {
-		result = `${diffHours}小时前`; // 小于1天，显示“X小时前”
+	if (isToday(date1)) {
+		// 如果是今天，显示“今天 HH:mm”
+		const hours = String(date1.getHours()).padStart(2, '0'); // 补零
+		const minutes = String(date1.getMinutes()).padStart(2, '0'); // 补零
+		result = `今天 ${hours}:${minutes}`;
 	} else if (diffDays === 1) {
 		// 昨天
 		const yesterdayHours = String(date1.getHours()).padStart(2, '0'); // 昨天的小时数
 		const yesterdayMinutes = String(date1.getMinutes()).padStart(2, '0'); // 昨天的分钟数
 		result = `昨天 ${yesterdayHours}:${yesterdayMinutes}`;
+	} else if (diffDays < 7) {
+		// 本周内，显示星期几
+		const dayOfWeek = weekDays[date1.getDay()]; // 获取星期几
+		const hours = String(date1.getHours()).padStart(2, '0'); // 补零
+		const minutes = String(date1.getMinutes()).padStart(2, '0'); // 补零
+		result = `${dayOfWeek} ${hours}:${minutes}`;
 	} else {
-		// 超过昨天，显示具体日期和时间
+		// 超过一周，显示具体日期
 		const year = date1.getFullYear();
 		const month = String(date1.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要加1
 		const day = String(date1.getDate()).padStart(2, '0'); // 补零
@@ -88,4 +93,16 @@ export function relativeTime(timeString, keyword) {
 	}
 
 	return result === currentTime ? '' : (currentTime = result);
+}
+
+/**
+ * 判断日期是否是今天
+ */
+function isToday(date) {
+	const today = new Date();
+	return (
+		date.getFullYear() === today.getFullYear() &&
+		date.getMonth() === today.getMonth() &&
+		date.getDate() === today.getDate()
+	);
 }

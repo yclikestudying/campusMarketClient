@@ -52,7 +52,7 @@ export const singleFile = async (url, filePath) => {
 }
 
 /**
- * 并发上传多个文件
+ * 上传多个文件
  */
 export const moreFile = async (url, files, textContent) => {
 	return await uni.uploadFile({

@@ -34,7 +34,8 @@ export const toOtherPage = (name) => {
 		"attention": "/pages/my/friend/friend?keyword=关注",
 		"fans": "/pages/my/friend/friend?keyword=粉丝",
 		"setting": "/pages/my/setting/setting",
-		"article": "/pages/my/myIndex/myIndex?role=me&permission=update"
+		"article": "/pages/my/myIndex/myIndex?role=me&permission=update",
+		"visit": "/pages/my/friend/friend?keyword=最近访问"
 	}
 	const url = routes[`${name}`]
 	uni.navigateTo({

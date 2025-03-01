@@ -32,6 +32,7 @@ if (uni.restoreGlobal) {
 (function(vue, shared) {
   "use strict";
   const ON_SHOW = "onShow";
+  const ON_LAUNCH = "onLaunch";
   const ON_LOAD = "onLoad";
   const ON_PULL_DOWN_REFRESH = "onPullDownRefresh";
   function formatAppLog(type, filename, ...args) {
@@ -48,6 +49,7 @@ if (uni.restoreGlobal) {
     !vue.isInSSRComponentSetup && vue.injectHook(lifecycle, hook, target);
   };
   const onShow = /* @__PURE__ */ createHook(ON_SHOW);
+  const onLaunch = /* @__PURE__ */ createHook(ON_LAUNCH);
   const onLoad = /* @__PURE__ */ createHook(ON_LOAD);
   const onPullDownRefresh = /* @__PURE__ */ createHook(ON_PULL_DOWN_REFRESH);
   const baseURL = "http://192.168.180.28:8080";
@@ -99,6 +101,96 @@ if (uni.restoreGlobal) {
       }
     });
   };
+  class WebSocketClient {
+    constructor(userId) {
+      this.userId = userId;
+      this.socketTask = null;
+      this.isConnected = false;
+      this.reconnectTimer = null;
+      this.reconnectInterval = 5e3;
+      this.oneByOne = null;
+      this.baseURL = "http://192.168.180.28:8080/wsConnect";
+    }
+    connect() {
+      if (this.socketTask && this.isConnected) {
+        formatAppLog("log", "at pages/common/util/socket.js:14", "WebSocket 已经连接");
+        return;
+      }
+      this.socketTask = uni.connectSocket({
+        url: `${this.baseURL}/${this.userId}`,
+        success: () => {
+          formatAppLog("log", "at pages/common/util/socket.js:21", "WebSocket 连接成功");
+        },
+        fail: (err) => {
+          formatAppLog("error", "at pages/common/util/socket.js:24", "WebSocket 连接失败", err);
+          this.reconnect();
+        }
+      });
+      this.socketTask.onOpen(() => {
+        formatAppLog("log", "at pages/common/util/socket.js:30", "WebSocket 已打开");
+        this.isConnected = true;
+        clearTimeout(this.reconnectTimer);
+      });
+      this.socketTask.onMessage((res) => {
+        this.handleMessage(res.data);
+      });
+      this.socketTask.onClose(() => {
+        formatAppLog("log", "at pages/common/util/socket.js:40", "WebSocket 已关闭");
+        this.isConnected = false;
+      });
+      this.socketTask.onError((err) => {
+        formatAppLog("error", "at pages/common/util/socket.js:45", "WebSocket 发生错误", err.errMsg);
+        this.isConnected = false;
+        this.reconnect();
+      });
+    }
+    handleMessage(message) {
+      uni.$emit("websocketMessage", message);
+    }
+    send(data) {
+      if (this.socketTask && this.isConnected) {
+        this.socketTask.send({
+          data,
+          success: () => {
+            formatAppLog("log", "at pages/common/util/socket.js:60", "消息发送成功");
+          },
+          fail: (err) => {
+            formatAppLog("error", "at pages/common/util/socket.js:63", "消息发送失败", err);
+          }
+        });
+      } else {
+        formatAppLog("error", "at pages/common/util/socket.js:67", "WebSocket 未连接，无法发送消息");
+      }
+    }
+    close() {
+      if (this.socketTask) {
+        this.socketTask.close({
+          success: () => {
+            this.isConnected = false;
+          },
+          fail: (err) => {
+            formatAppLog("error", "at pages/common/util/socket.js:78", "WebSocket 关闭失败", err);
+          }
+        });
+      }
+    }
+    reconnect() {
+      if (this.isConnected)
+        return;
+      this.reconnectTimer = setTimeout(() => {
+        this.connect();
+      }, this.reconnectInterval);
+    }
+    getOneByOne() {
+      return this.oneByOne;
+    }
+    setOneByOne(id) {
+      this.oneByOne = id;
+    }
+    getIsConnected() {
+      return this.isConnected;
+    }
+  }
   let phoneNumber = vue.ref("17823257046");
   let password = vue.ref("111111");
   let checkPassword = vue.ref("");
@@ -124,6 +216,10 @@ if (uni.restoreGlobal) {
         if (data.code === 200) {
           uni.setStorageSync("token", data.data.token);
           uni.setStorageSync("user", data.data.user);
+          const socket = new WebSocketClient(data.data.user.userId);
+          socket.connect();
+          const app = getApp();
+          app.globalData.sockets[`${data.data.user.userId}`] = socket;
           uni.switchTab({
             url: "/pages/tabbar/home/home"
           });
@@ -149,7 +245,7 @@ if (uni.restoreGlobal) {
         }
       }
     } catch (err) {
-      formatAppLog("log", "at pages/login/login.js:74", err);
+      formatAppLog("log", "at pages/login/login.js:81", err);
     } finally {
       loading.value = false;
     }
@@ -1388,8 +1484,8 @@ if (uni.restoreGlobal) {
   const deleteArticleAfter = (articles, articleId) => {
     return articles.filter((article) => article.articleId !== articleId);
   };
-  const searchUser = async (content2) => {
-    return await request(`/userInfo/queryLikeUser?keyword=${content2}`, "GET", null);
+  const searchUser = async (content) => {
+    return await request(`/userInfo/queryLikeUser?keyword=${content}`, "GET", null);
   };
   const getAttention$1 = async (userId) => {
     let url = userId === null ? `/friend/attention` : `/friend/attention?userId=${userId}`;
@@ -1424,6 +1520,24 @@ if (uni.restoreGlobal) {
   };
   const unattentionUserAfter = (fansList, myInfo) => {
     return fansList.filter((fan) => fan.userId !== myInfo.userId);
+  };
+  const logout = () => {
+    return request(`/user/logout`, "DELETE", null);
+  };
+  const visitLog = (userId) => {
+    return requestPromise(`/visit/addVisit?visitedId=${userId}`, "PUT", null);
+  };
+  const queryVisit = (userId) => {
+    return requestPromise("/visit/queryVisit", "GET", null);
+  };
+  const uploadSingleFile = async (file) => {
+    return await singleFile("/message/uploadImage", file);
+  };
+  const queryChatMessage = async (otherId) => {
+    return await requestPromise(`/message/queryMessage?otherId=${otherId}`, "GET", null);
+  };
+  const read$1 = async (otherId) => {
+    return await requestPromise(`/message/read?otherId=${otherId}`, "PUT", null);
   };
   let currentTime = null;
   const userInfoProgress = () => {
@@ -1460,21 +1574,22 @@ if (uni.restoreGlobal) {
     const date1 = new Date(formatDate(timeString));
     const date2 = /* @__PURE__ */ new Date();
     const diffMs = date2 - date1;
-    const diffSeconds = Math.floor(diffMs / 1e3);
-    const diffMinutes = Math.floor(diffSeconds / 60);
-    const diffHours = Math.floor(diffMinutes / 60);
-    const diffDays = Math.floor(diffHours / 24);
+    const diffDays = Math.floor(diffMs / (1e3 * 60 * 60 * 24));
+    const weekDays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
     let result;
-    if (diffSeconds < 60) {
-      result = "刚刚";
-    } else if (diffMinutes < 60) {
-      result = `${diffMinutes}分钟前`;
-    } else if (diffHours < 24) {
-      result = `${diffHours}小时前`;
+    if (isToday(date1)) {
+      const hours = String(date1.getHours()).padStart(2, "0");
+      const minutes = String(date1.getMinutes()).padStart(2, "0");
+      result = `今天 ${hours}:${minutes}`;
     } else if (diffDays === 1) {
       const yesterdayHours = String(date1.getHours()).padStart(2, "0");
       const yesterdayMinutes = String(date1.getMinutes()).padStart(2, "0");
       result = `昨天 ${yesterdayHours}:${yesterdayMinutes}`;
+    } else if (diffDays < 7) {
+      const dayOfWeek = weekDays[date1.getDay()];
+      const hours = String(date1.getHours()).padStart(2, "0");
+      const minutes = String(date1.getMinutes()).padStart(2, "0");
+      result = `${dayOfWeek} ${hours}:${minutes}`;
     } else {
       const year = date1.getFullYear();
       const month = String(date1.getMonth() + 1).padStart(2, "0");
@@ -1491,6 +1606,10 @@ if (uni.restoreGlobal) {
       return result;
     }
     return result === currentTime ? "" : currentTime = result;
+  }
+  function isToday(date) {
+    const today = /* @__PURE__ */ new Date();
+    return date.getFullYear() === today.getFullYear() && date.getMonth() === today.getMonth() && date.getDate() === today.getDate();
   }
   const toOtherPage$6 = (name2, role, permission, param, type) => {
     const routes = {
@@ -1535,7 +1654,7 @@ if (uni.restoreGlobal) {
         buttonColor: "#FEE802",
         iconColor: "#fff"
       });
-      let content2 = vue.ref([
+      let content = vue.ref([
         {
           iconPath: "/static/home/校园圈子.png",
           text: "校园动态",
@@ -1707,9 +1826,9 @@ if (uni.restoreGlobal) {
       }, set pattern(v2) {
         pattern = v2;
       }, get content() {
-        return content2;
+        return content;
       }, set content(v2) {
-        content2 = v2;
+        content = v2;
       }, get articles() {
         return articles;
       }, set articles(v2) {
@@ -2329,6 +2448,7 @@ if (uni.restoreGlobal) {
                                 onClick: vue.withModifiers(($event) => $setup.toOtherPage("image", _ctx.role, _ctx.permission, photo, "photo"), ["stop"])
                               }, [
                                 vue.createElementVNode("image", {
+                                  "lazy-load": "true",
                                   src: photo,
                                   mode: ""
                                 }, null, 8, ["src"])
@@ -2758,6 +2878,7 @@ if (uni.restoreGlobal) {
         animationType: "slide-in-right",
         animationDuration: 300,
         "app-plus": {
+          softinputMode: "adjustPan",
           bounce: "none",
           scrollIndicator: "none",
           titleNView: {
@@ -6179,7 +6300,8 @@ ${o3}
       "attention": "/pages/my/friend/friend?keyword=关注",
       "fans": "/pages/my/friend/friend?keyword=粉丝",
       "setting": "/pages/my/setting/setting",
-      "article": "/pages/my/myIndex/myIndex?role=me&permission=update"
+      "article": "/pages/my/myIndex/myIndex?role=me&permission=update",
+      "visit": "/pages/my/friend/friend?keyword=最近访问"
     };
     const url = routes[`${name2}`];
     uni.navigateTo({
@@ -6200,6 +6322,7 @@ ${o3}
       let attention = vue.ref(0);
       let fans = vue.ref(0);
       let isLoading2 = vue.ref(false);
+      let visitCount = vue.ref(null);
       onLoad(async (e2) => {
         const user = uni.getStorageSync("user");
         userAvatar.value = user.userAvatar;
@@ -6207,18 +6330,21 @@ ${o3}
         isAdmin.value = user.isAdmin;
         try {
           isLoading2.value = true;
-          const [res1, res2, res3, res4] = await Promise.all([
+          const [res1, res2, res3, res4, res5] = await Promise.all([
             getArticle(),
             getAttention(),
             getFans(),
-            getAttentionFans()
+            getAttentionFans(),
+            // 查询访客记录
+            queryVisit()
           ]);
           article.value = res1;
           attention.value = res2;
           fans.value = res3;
           attentionFans.value = res4;
+          visitCount.value = res5 ? res5.length : "";
         } catch (err) {
-          formatAppLog("log", "at pages/tabbar/my/my.vue:108", err);
+          formatAppLog("log", "at pages/tabbar/my/my.vue:115", err);
         } finally {
           isLoading2.value = false;
         }
@@ -6236,7 +6362,7 @@ ${o3}
           fans.value = res3;
           attentionFans.value = res4;
         } catch (err) {
-          formatAppLog("log", "at pages/tabbar/my/my.vue:127", err);
+          formatAppLog("log", "at pages/tabbar/my/my.vue:134", err);
         }
       });
       const __returned__ = { get userAvatar() {
@@ -6271,6 +6397,10 @@ ${o3}
         return isLoading2;
       }, set isLoading(v2) {
         isLoading2 = v2;
+      }, get visitCount() {
+        return visitCount;
+      }, set visitCount(v2) {
+        visitCount = v2;
       }, ref: vue.ref, get toOtherPage() {
         return toOtherPage$3;
       }, get getArticle() {
@@ -6287,6 +6417,8 @@ ${o3}
         return onLoad;
       }, get onPullDownRefresh() {
         return onPullDownRefresh;
+      }, get queryVisit() {
+        return queryVisit;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
@@ -6406,8 +6538,10 @@ ${o3}
           vue.createVNode(_component_van_cell, {
             title: "访客",
             icon: "eye-o",
-            "is-link": ""
-          }),
+            value: $setup.visitCount,
+            "is-link": "",
+            onClick: _cache[5] || (_cache[5] = ($event) => $setup.toOtherPage("visit"))
+          }, null, 8, ["value"]),
           vue.createVNode(_component_van_cell, {
             title: "邀请",
             icon: "friends-o",
@@ -6432,7 +6566,7 @@ ${o3}
             title: "设置",
             icon: "setting-o",
             "is-link": "",
-            onClick: _cache[5] || (_cache[5] = ($event) => $setup.toOtherPage("setting"))
+            onClick: _cache[6] || (_cache[6] = ($event) => $setup.toOtherPage("setting"))
           })
         ])
       ])
@@ -8823,14 +8957,14 @@ ${o3}
     "uni-search-bar.cancel": "取消",
     "uni-search-bar.placeholder": "請輸入搜索內容"
   };
-  const messages$3 = {
+  const messages$2 = {
     en: en$2,
     "zh-Hans": zhHans$2,
     "zh-Hant": zhHant$2
   };
   const {
     t: t$o
-  } = initVueI18n(messages$3);
+  } = initVueI18n(messages$2);
   const _sfc_main$r = {
     name: "UniSearchBar",
     emits: ["input", "update:modelValue", "clear", "cancel", "confirm", "blur", "focus"],
@@ -9054,7 +9188,7 @@ ${o3}
     __name: "search",
     setup(__props, { expose: __expose }) {
       __expose();
-      let content2 = vue.ref("");
+      let content = vue.ref("");
       let history = vue.ref([]);
       let users = vue.ref([]);
       let isLoading2 = vue.ref(false);
@@ -9066,11 +9200,11 @@ ${o3}
       };
       const search = async (item) => {
         if (item !== "") {
-          content2.value = item;
+          content.value = item;
         }
         isLoading2.value = true;
         try {
-          const res = await searchUser(content2.value);
+          const res = await searchUser(content.value);
           if (res.data.code === 200) {
             users.value = res.data.data;
             if (users.value.length === 0) {
@@ -9079,9 +9213,9 @@ ${o3}
                 icon: "none"
               });
             }
-            const index = history.value.findIndex((item2) => item2 === content2.value);
+            const index = history.value.findIndex((item2) => item2 === content.value);
             if (index === -1) {
-              history.value.push(content2.value);
+              history.value.push(content.value);
               uni.setStorageSync("history", history.value);
               history.value = uni.getStorageSync("history");
             }
@@ -9098,7 +9232,7 @@ ${o3}
         history.value = uni.getStorageSync("history");
       };
       const clear = () => {
-        content2.value = "";
+        content.value = "";
         users.value.length = 0;
       };
       const onClick = (name2, userId) => {
@@ -9107,9 +9241,9 @@ ${o3}
         });
       };
       const __returned__ = { get content() {
-        return content2;
+        return content;
       }, set content(v2) {
-        content2 = v2;
+        content = v2;
       }, get history() {
         return history;
       }, set history(v2) {
@@ -9209,13 +9343,19 @@ ${o3}
     const routes = {
       "info": `/pages/my/info/info?role=${role}&permission=${permission}`,
       "image": `/pages/image/image?role=${role}&permission=${permission}&type=${type}`,
-      "article": `/pages/article/article?role=${role}&permission=${permission}`
+      "article": `/pages/article/article?role=${role}&permission=${permission}`,
+      "chat": `/pages/message/chat/chat?role=${role}&permission=${permission}`
+      // "attention": `/pages/my/friend/friend?keyword=关注&userId=${param}`,
+      // "fans": `/pages/my/friend/friend?keyword=粉丝&userId=${param}`
     };
     if (name2 === "image") {
       uni.setStorageSync("image", param);
     }
     if (name2 === "article") {
       uni.setStorageSync("article", param);
+    }
+    if (name2 === "chat") {
+      uni.setStorageSync("chatUser", param);
     }
     const url = routes[`${name2}`];
     uni.navigateTo({
@@ -9244,6 +9384,7 @@ ${o3}
         userName: uni.getStorageSync("user").userName,
         userProfile: uni.getStorageSync("user").userProfile
       });
+      let socket = getApp().globalData.sockets[`${myId.value}`];
       onLoad(async (e2) => {
         role.value = e2.role;
         permission.value = e2.permission;
@@ -9261,14 +9402,14 @@ ${o3}
               getUserArticle(null)
             ]);
             attentionList.value = res1;
-            fansList.value = res2;
-            articles.value = res3;
+            fansList.value = res2 ?? [];
+            articles.value = res3 ?? [];
           } catch (err) {
-            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:254", err);
+            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:256", err);
           }
         } else {
           try {
-            const [res1, res2, res3, res4] = await Promise.all([
+            const [res1, res2, res3, res4, res5] = await Promise.all([
               // 获取关注数量
               getAttention$1(otherId.value),
               // 获取粉丝数量
@@ -9276,26 +9417,28 @@ ${o3}
               // 获取用户信息
               getUserInfo(otherId.value),
               // 获取用户动态信息
-              getUserArticle(otherId.value)
+              getUserArticle(otherId.value),
+              // 记录访客记录
+              visitLog(otherId.value)
             ]);
             attentionList.value = res1;
             fansList.value = res2 ?? [];
             user.value = res3;
-            articles.value = res4;
+            articles.value = res4 ?? [];
             uni.setStorageSync("other", user.value);
           } catch (err) {
-            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:276", err);
-          } finally {
+            formatAppLog("log", "at pages/my/myIndex/myIndex.vue:280", err);
           }
         }
+        uni.setNavigationBarTitle({
+          title: user.value.userName
+        });
+        socket.setOneByOne(null);
       });
       onShow(async () => {
         if (role.value === "me") {
           user.value = uni.getStorageSync("user");
           progress.value = userInfoProgress();
-          uni.setNavigationBarTitle({
-            title: user.value.userName
-          });
         }
       });
       const onLike = async (articleId, publishUserId) => {
@@ -9416,6 +9559,10 @@ ${o3}
         return myInfo;
       }, set myInfo(v2) {
         myInfo = v2;
+      }, get socket() {
+        return socket;
+      }, set socket(v2) {
+        socket = v2;
       }, onLike, onUnlike, deleteByArticleId, attention, unattention, setCurrentOption, onSwiperChange, scroll, get onLoad() {
         return onLoad;
       }, get onShow() {
@@ -9460,13 +9607,15 @@ ${o3}
         return attentionUserAfter;
       }, get unattentionUserAfter() {
         return unattentionUserAfter;
+      }, get visitLog() {
+        return visitLog;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   };
   function _sfc_render$o(_ctx, _cache, $props, $setup, $data, $options) {
-    var _a, _b, _c, _d, _e2, _f;
+    var _a, _b, _c, _d, _e2, _f, _g, _h;
     const _component_van_icon = vue.resolveComponent("van-icon");
     const _component_van_button = vue.resolveComponent("van-button");
     const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
@@ -9562,7 +9711,8 @@ ${o3}
                 })),
                 vue.createVNode(_component_uni_icons, {
                   type: "chat",
-                  size: "30"
+                  size: "30",
+                  onClick: _cache[3] || (_cache[3] = ($event) => $setup.toOtherPage("chat", "me", "update", { userId: $setup.user.userId, userAvatar: $setup.user.userAvatar, userName: $setup.user.userName }))
                 })
               ]))
             ]),
@@ -9589,7 +9739,7 @@ ${o3}
                 vue.createElementVNode(
                   "text",
                   null,
-                  vue.toDisplayString($setup.attentionList ? $setup.attentionList.length : 0),
+                  vue.toDisplayString(((_d = $setup.attentionList) == null ? void 0 : _d.length) ?? 0),
                   1
                   /* TEXT */
                 ),
@@ -9599,20 +9749,17 @@ ${o3}
                 vue.createElementVNode(
                   "text",
                   null,
-                  vue.toDisplayString($setup.fansList ? $setup.fansList.length : 0),
+                  vue.toDisplayString(((_e2 = $setup.fansList) == null ? void 0 : _e2.length) ?? 0),
                   1
                   /* TEXT */
                 ),
                 vue.createElementVNode("text", null, "粉丝")
               ]),
-              vue.createElementVNode("view", { class: "data-item" }, [
-                vue.createElementVNode("text", null, "4"),
-                vue.createElementVNode("text", null, "访客")
-              ])
+              vue.createCommentVNode(' 					<view class="data-item">\r\n						<text>4</text>\r\n						<text>访客</text>\r\n					</view> ')
             ]),
             vue.createElementVNode("view", { class: "tag" }, [
               vue.createElementVNode("text", null, "标签:"),
-              ((_d = $setup.user) == null ? void 0 : _d.userTags) ? (vue.openBlock(true), vue.createElementBlock(
+              ((_f = $setup.user) == null ? void 0 : _f.userTags) ? (vue.openBlock(true), vue.createElementBlock(
                 vue.Fragment,
                 { key: 0 },
                 vue.renderList(JSON.parse($setup.user.userTags), (tag, index) => {
@@ -9647,7 +9794,7 @@ ${o3}
               vue.createElementVNode(
                 "text",
                 null,
-                "注册时间:" + vue.toDisplayString($setup.formatDate((_e2 = $setup.user) == null ? void 0 : _e2.createTime)),
+                "注册时间:" + vue.toDisplayString($setup.formatDate((_g = $setup.user) == null ? void 0 : _g.createTime)),
                 1
                 /* TEXT */
               )
@@ -9659,7 +9806,7 @@ ${o3}
               vue.createElementVNode(
                 "text",
                 null,
-                "简介:" + vue.toDisplayString((_f = $setup.user) == null ? void 0 : _f.userProfile),
+                "简介:" + vue.toDisplayString((_h = $setup.user) == null ? void 0 : _h.userProfile),
                 1
                 /* TEXT */
               )
@@ -9668,7 +9815,7 @@ ${o3}
           vue.createElementVNode("view", { class: "option" }, [
             vue.createElementVNode("view", {
               class: "option-item",
-              onClick: _cache[3] || (_cache[3] = ($event) => $setup.setCurrentOption(0))
+              onClick: _cache[4] || (_cache[4] = ($event) => $setup.setCurrentOption(0))
             }, [
               vue.createElementVNode(
                 "text",
@@ -9692,7 +9839,7 @@ ${o3}
             ]),
             vue.createElementVNode("view", {
               class: "option-item",
-              onClick: _cache[4] || (_cache[4] = ($event) => $setup.setCurrentOption(1))
+              onClick: _cache[5] || (_cache[5] = ($event) => $setup.setCurrentOption(1))
             }, [
               vue.createElementVNode(
                 "text",
@@ -9707,7 +9854,7 @@ ${o3}
             ]),
             vue.createElementVNode("view", {
               class: "option-item",
-              onClick: _cache[5] || (_cache[5] = ($event) => $setup.setCurrentOption(2))
+              onClick: _cache[6] || (_cache[6] = ($event) => $setup.setCurrentOption(2))
             }, [
               vue.createElementVNode(
                 "text",
@@ -9722,7 +9869,7 @@ ${o3}
             ]),
             vue.createElementVNode("view", {
               class: "option-item",
-              onClick: _cache[6] || (_cache[6] = ($event) => $setup.setCurrentOption(3))
+              onClick: _cache[7] || (_cache[7] = ($event) => $setup.setCurrentOption(3))
             }, [
               vue.createElementVNode(
                 "text",
@@ -9840,6 +9987,7 @@ ${o3}
                                   onClick: vue.withModifiers(($event) => $setup.toOtherPage("image", $setup.role, $setup.permission, photo, "photo"), ["stop"])
                                 }, [
                                   vue.createElementVNode("image", {
+                                    "lazy-load": "true",
                                     src: photo,
                                     mode: ""
                                   }, null, 8, ["src"])
@@ -9865,7 +10013,7 @@ ${o3}
                             vue.createElementVNode(
                               "text",
                               null,
-                              vue.toDisplayString(article.like.count || 0),
+                              vue.toDisplayString(article.like.count ?? 0),
                               1
                               /* TEXT */
                             ),
@@ -9876,7 +10024,7 @@ ${o3}
                             vue.createElementVNode(
                               "text",
                               null,
-                              vue.toDisplayString(article.comment.count || 0),
+                              vue.toDisplayString(article.comment.count ?? 0),
                               1
                               /* TEXT */
                             )
@@ -10300,7 +10448,7 @@ ${o3}
       const fullDate = this.date.fullDate;
       for (let i2 = 1; i2 <= amount; i2++) {
         const currentDate = `${dateObj.year}-${dateObj.month}-${addZero(i2)}`;
-        const isToday = fullDate === currentDate;
+        const isToday2 = fullDate === currentDate;
         const info = this.selected && this.selected.find((item) => {
           if (this.dateEqual(currentDate, item.date)) {
             return item;
@@ -10332,7 +10480,7 @@ ${o3}
             currentDate,
             this.endDate
           ),
-          isToday,
+          isToday: isToday2,
           userChecked: false,
           extraInfo: info
         });
@@ -13567,7 +13715,7 @@ ${o3}
     "uni-load-more.contentrefresh": "正在加載...",
     "uni-load-more.contentnomore": "沒有更多數據了"
   };
-  const messages$2 = {
+  const messages$1 = {
     en,
     "zh-Hans": zhHans,
     "zh-Hant": zhHant
@@ -13578,7 +13726,7 @@ ${o3}
   }, 16);
   const {
     t: t$l
-  } = initVueI18n(messages$2);
+  } = initVueI18n(messages$1);
   const _sfc_main$g = {
     name: "UniLoadMore",
     emits: ["clickLoadMore"],
@@ -18127,6 +18275,9 @@ ${o3}
         uni.setNavigationBarTitle({
           title: e2.keyword
         });
+        if (e2.userId) {
+          userId.value = e2.userId;
+        }
         if (e2.keyword === "关注") {
           const res = await getFriend(`/friend/attention?userId=${userId.value}`);
           if (res.data.code === 200) {
@@ -18146,6 +18297,10 @@ ${o3}
           if (res.data.code === 200) {
             users.value = res.data.data;
           }
+          return;
+        }
+        if (e2.keyword === "最近访问") {
+          users.value = await queryVisit();
         }
       });
       const onClick = (userId2) => {
@@ -18165,6 +18320,10 @@ ${o3}
         return onLoad;
       }, ref: vue.ref, get getFriend() {
         return getFriend;
+      }, get queryVisit() {
+        return queryVisit;
+      }, get relativeTime() {
+        return relativeTime;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
@@ -18191,8 +18350,9 @@ ${o3}
               title: user.userName,
               avatar: user.userAvatar,
               note: user.userProfile ?? "",
+              time: $setup.relativeTime(user.visitTime, "other"),
               onClick: ($event) => $setup.onClick(user.userId)
-            }, null, 8, ["title", "avatar", "note", "onClick"]);
+            }, null, 8, ["title", "avatar", "note", "time", "onClick"]);
           }),
           128
           /* KEYED_FRAGMENT */
@@ -18201,41 +18361,155 @@ ${o3}
     ]);
   }
   const PagesMyFriendFriend = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-a90bf1cf"], ["__file", "E:/code/design/client/CampusMarket/pages/my/friend/friend.vue"]]);
-  let scrollIntoId = vue.ref("");
-  let content = vue.ref("");
-  let messages$1 = vue.ref([]);
-  const send = () => {
-  };
   const _sfc_main$6 = {
     __name: "chat",
     setup(__props, { expose: __expose }) {
       __expose();
-      const __returned__ = { get scrollIntoId() {
+      let role = vue.ref(null);
+      let permission = vue.ref(null);
+      let myId = vue.ref(uni.getStorageSync("user").userId);
+      let myAvatar = vue.ref(uni.getStorageSync("user").userAvatar);
+      let otherId = vue.ref(uni.getStorageSync("chatUser").userId);
+      let otherAvatar = vue.ref(uni.getStorageSync("chatUser").userAvatar);
+      let title = vue.ref(uni.getStorageSync("chatUser").userName);
+      let scrollIntoId = vue.ref("");
+      let content = vue.ref("");
+      let messages2 = vue.ref([]);
+      let isLoading2 = vue.ref(false);
+      let socket = getApp().globalData.sockets[`${myId.value}`];
+      onLoad(async (e2) => {
+        role.value = e2.role;
+        permission.value = e2.permission;
+        uni.setNavigationBarTitle({
+          title: title.value
+        });
+        messages2.value = await queryChatMessage(otherId.value);
+        await read$1(otherId.value);
+        scrollIntoId.value = `message${messages2.value.length - 1}`;
+        socket.setOneByOne(otherId.value);
+      });
+      vue.watch(messages2, (value) => {
+        scrollIntoId.value = `message${value.length - 1}`;
+      });
+      const send = (type) => {
+        socket.send(JSON.stringify({
+          content: content.value,
+          sendUserId: myId.value,
+          acceptUserId: otherId.value,
+          type
+        }));
+        content.value = "";
+      };
+      const sendImage = () => {
+        uni.chooseImage({
+          count: 1,
+          sizeType: ["original", "compressed"],
+          sourceType: ["album", "camera"],
+          success: async (res) => {
+            try {
+              const res1 = await uploadSingleFile(res.tempFilePaths[0]);
+              const data = JSON.parse(res1.data);
+              if (data.code === 200) {
+                content.value = data.data;
+                send("image");
+              }
+            } catch (err) {
+              formatAppLog("log", "at pages/message/chat/chat.vue:113", err);
+            }
+          }
+        });
+      };
+      uni.$on("updateMessage", async () => {
+        messages2.value = await queryChatMessage(otherId.value);
+      });
+      const toOtherPage2 = (name2, role2, permission2, param, type) => {
+        const routes = {
+          "image": `/pages/image/image?role=${role2}&permission=${permission2}&type=${type}`
+        };
+        if (name2 === "image") {
+          uni.setStorageSync("image", param);
+        }
+        const url = routes[`${name2}`];
+        uni.navigateTo({
+          url
+        });
+      };
+      const __returned__ = { get role() {
+        return role;
+      }, set role(v2) {
+        role = v2;
+      }, get permission() {
+        return permission;
+      }, set permission(v2) {
+        permission = v2;
+      }, get myId() {
+        return myId;
+      }, set myId(v2) {
+        myId = v2;
+      }, get myAvatar() {
+        return myAvatar;
+      }, set myAvatar(v2) {
+        myAvatar = v2;
+      }, get otherId() {
+        return otherId;
+      }, set otherId(v2) {
+        otherId = v2;
+      }, get otherAvatar() {
+        return otherAvatar;
+      }, set otherAvatar(v2) {
+        otherAvatar = v2;
+      }, get title() {
+        return title;
+      }, set title(v2) {
+        title = v2;
+      }, get scrollIntoId() {
         return scrollIntoId;
+      }, set scrollIntoId(v2) {
+        scrollIntoId = v2;
       }, get content() {
         return content;
+      }, set content(v2) {
+        content = v2;
       }, get messages() {
-        return messages$1;
-      }, get send() {
-        return send;
+        return messages2;
+      }, set messages(v2) {
+        messages2 = v2;
+      }, get isLoading() {
+        return isLoading2;
+      }, set isLoading(v2) {
+        isLoading2 = v2;
+      }, get socket() {
+        return socket;
+      }, set socket(v2) {
+        socket = v2;
+      }, send, sendImage, toOtherPage: toOtherPage2, ref: vue.ref, watch: vue.watch, get onLoad() {
+        return onLoad;
+      }, get onShow() {
+        return onShow;
+      }, get relativeTime() {
+        return relativeTime;
+      }, get uploadSingleFile() {
+        return uploadSingleFile;
+      }, get queryChatMessage() {
+        return queryChatMessage;
+      }, get read() {
+        return read$1;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   };
   function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_uni_icons = resolveEasycom(vue.resolveDynamicComponent("uni-icons"), __easycom_0$5);
     const _component_uni_easyinput = resolveEasycom(vue.resolveDynamicComponent("uni-easyinput"), __easycom_1$1);
     return vue.openBlock(), vue.createElementBlock("view", { class: "chat" }, [
       vue.createElementVNode("view", { class: "content" }, [
         vue.createElementVNode("scroll-view", {
           "scroll-y": "true",
+          "scroll-with-animation": $setup.isLoading,
           class: "chat-content",
           "scroll-into-view": $setup.scrollIntoId
         }, [
-          vue.createElementVNode("image", {
-            src: _imports_0,
-            mode: ""
-          }),
           $setup.messages !== null ? (vue.openBlock(true), vue.createElementBlock(
             vue.Fragment,
             { key: 0 },
@@ -18248,22 +18522,27 @@ ${o3}
                     vue.createElementVNode(
                       "text",
                       null,
-                      vue.toDisplayString(_ctx.relativeTime(message.createTime)),
+                      vue.toDisplayString($setup.relativeTime(message.createTime)),
                       1
                       /* TEXT */
                     )
                   ]),
                   vue.createElementVNode("view", {
                     id: index === $setup.messages.length - 1 ? `message${index}` : "",
-                    class: vue.normalizeClass({ user: true, me: _ctx.userId === message.userId })
+                    class: vue.normalizeClass({ user: true, me: message.sendUserId === $setup.myId })
                   }, [
                     vue.createElementVNode("view", { class: "image" }, [
                       vue.createElementVNode("image", {
-                        src: message.userAvatar,
+                        class: "avatar",
+                        "lazy-load": "true",
+                        src: message.sendUserId === $setup.myId ? $setup.myAvatar : $setup.otherAvatar,
                         mode: ""
                       }, null, 8, ["src"])
                     ]),
-                    vue.createElementVNode("view", { class: "message" }, [
+                    message.type === "text" ? (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 0,
+                      class: "message"
+                    }, [
                       vue.createElementVNode(
                         "text",
                         null,
@@ -18271,7 +18550,17 @@ ${o3}
                         1
                         /* TEXT */
                       )
-                    ])
+                    ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                      key: 1,
+                      class: "messageImage",
+                      onClick: ($event) => $setup.toOtherPage("image", $setup.role, $setup.permission, message.content, "image")
+                    }, [
+                      vue.createElementVNode("image", {
+                        "lazy-load": "true",
+                        src: message.content,
+                        mode: "widthFix"
+                      }, null, 8, ["src"])
+                    ], 8, ["onClick"]))
                   ], 10, ["id"])
                 ],
                 64
@@ -18281,8 +18570,13 @@ ${o3}
             256
             /* UNKEYED_FRAGMENT */
           )) : vue.createCommentVNode("v-if", true)
-        ], 8, ["scroll-into-view"]),
+        ], 8, ["scroll-with-animation", "scroll-into-view"]),
         vue.createElementVNode("view", { class: "input" }, [
+          vue.createVNode(_component_uni_icons, {
+            type: "image",
+            size: "30",
+            onClick: $setup.sendImage
+          }),
           vue.createVNode(_component_uni_easyinput, {
             class: "uni-mt-5",
             modelValue: $setup.content,
@@ -18291,7 +18585,7 @@ ${o3}
             placeholder: "请输入内容"
           }, null, 8, ["modelValue"]),
           vue.createElementVNode("text", {
-            onClick: _cache[1] || (_cache[1] = (...args) => $setup.send && $setup.send(...args))
+            onClick: _cache[1] || (_cache[1] = ($event) => $setup.send("text"))
           }, "发送")
         ])
       ])
@@ -18302,12 +18596,37 @@ ${o3}
     __name: "setting",
     setup(__props, { expose: __expose }) {
       __expose();
+      let userId = uni.getStorageSync("user").userId;
+      let socket = getApp().globalData.sockets[`${userId}`];
       const toOtherPage2 = () => {
-        uni.reLaunch({
-          url: "/pages/login/login"
+        uni.showModal({
+          title: "温馨提示",
+          content: "确认退出吗",
+          success: async function(res) {
+            if (res.confirm) {
+              const res1 = await logout();
+              if (res1.data.code === 200) {
+                socket.close();
+                delete getApp().globalData.sockets[`${userId}`];
+                uni.reLaunch({
+                  url: "/pages/login/login"
+                });
+              }
+            }
+          }
         });
       };
-      const __returned__ = { toOtherPage: toOtherPage2 };
+      const __returned__ = { get userId() {
+        return userId;
+      }, set userId(v2) {
+        userId = v2;
+      }, get socket() {
+        return socket;
+      }, set socket(v2) {
+        socket = v2;
+      }, toOtherPage: toOtherPage2, get logout() {
+        return logout;
+      } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
@@ -18449,7 +18768,7 @@ ${o3}
       let article = vue.ref(uni.getStorageSync("article"));
       let myId = vue.ref(uni.getStorageSync("user").userId);
       let otherId = vue.ref(article.value.publishUser.userId);
-      let content2 = vue.ref("");
+      let content = vue.ref("");
       let myInfo = vue.ref({
         userId: uni.getStorageSync("user").userId,
         userAvatar: uni.getStorageSync("user").userAvatar,
@@ -18483,16 +18802,16 @@ ${o3}
         });
       };
       const publishComment = async (articleId) => {
-        if (content2.value.length !== 0) {
+        if (content.value.length !== 0) {
           const res = await request("/comment/publish", "POST", {
             articleId,
-            content: content2.value,
+            content: content.value,
             userId: otherId.value
           });
           if (res.data.code === 200) {
             const res1 = await requestPromise(`/article/queryArticleByUserId?userId=${otherId.value}`, "GET", null);
             article.value = res1.find((article2) => article2.articleId === articleId);
-            content2.value = "";
+            content.value = "";
             uni.showToast({
               title: "发表成功"
             });
@@ -18572,9 +18891,9 @@ ${o3}
       }, set otherId(v2) {
         otherId = v2;
       }, get content() {
-        return content2;
+        return content;
       }, set content(v2) {
-        content2 = v2;
+        content = v2;
       }, get myInfo() {
         return myInfo;
       }, set myInfo(v2) {
@@ -18664,6 +18983,7 @@ ${o3}
                 onClick: ($event) => $setup.toOtherPage("image", $setup.role, $setup.permission, photo, "photo")
               }, [
                 vue.createElementVNode("image", {
+                  "lazy-load": "true",
                   src: photo,
                   mode: ""
                 }, null, 8, ["src"])
@@ -18782,14 +19102,38 @@ ${o3}
   __definePage("pages/image/image", PagesImageImage);
   __definePage("pages/article/article", PagesArticleArticle);
   const _sfc_main$2 = {
-    onLaunch: function() {
-      formatAppLog("log", "at App.vue:4", "App Launch");
-    },
-    onShow: function() {
-      formatAppLog("log", "at App.vue:7", "App Show");
-    },
-    onHide: function() {
-      formatAppLog("log", "at App.vue:10", "App Hide");
+    __name: "App",
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const sockets = {};
+      onLaunch(() => {
+        const app = getApp();
+        if (!app.globalData) {
+          app.globalData = {};
+        }
+        app.globalData.sockets = sockets;
+        formatAppLog("log", "at App.vue:14", "App Launch");
+      });
+      uni.$on("websocketMessage", (message) => {
+        const data = JSON.parse(message);
+        if (uni.getStorageSync("user").userId === data.sendUserId) {
+          uni.$emit("updateMessage");
+        } else {
+          let socket = getApp().globalData.sockets[`${data.acceptUserId}`];
+          if (socket.getIsConnected()) {
+            if (socket.getOneByOne() === data.sendUserId) {
+              uni.$emit("updateMessage");
+            }
+          }
+        }
+      });
+      const __returned__ = { sockets, get Socket() {
+        return WebSocketClient;
+      }, get onLaunch() {
+        return onLaunch;
+      } };
+      Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
+      return __returned__;
     }
   };
   const App = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["__file", "E:/code/design/client/CampusMarket/App.vue"]]);
@@ -19734,25 +20078,25 @@ ${o3}
           return true;
         }
         const {
-          content: content2,
+          content,
           showZero
         } = props2;
-        return isDef(content2) && content2 !== "" && (showZero || content2 !== 0 && content2 !== "0");
+        return isDef(content) && content !== "" && (showZero || content !== 0 && content !== "0");
       };
       const renderContent = () => {
         const {
           dot,
           max,
-          content: content2
+          content
         } = props2;
         if (!dot && hasContent()) {
           if (slots.content) {
             return slots.content();
           }
-          if (isDef(max) && isNumeric(content2) && +content2 > +max) {
+          if (isDef(max) && isNumeric(content) && +content > +max) {
             return `${max}+`;
           }
-          return content2;
+          return content;
         }
       };
       const getOffsetWithMinusString = (val) => val.startsWith("-") ? val.replace("-", "") : `-${val}`;
@@ -20823,10 +21167,10 @@ ${o3}
       };
       const renderDescription = () => {
         if (props2.description || slots.description) {
-          const content2 = slots.description ? slots.description() : props2.description;
+          const content = slots.description ? slots.description() : props2.description;
           return vue.createVNode("div", {
             "class": bem$1v("description")
-          }, [content2]);
+          }, [content]);
         }
       };
       return () => vue.createVNode(Popup, vue.mergeProps({
@@ -28615,16 +28959,16 @@ ${o3}
           "has-title": hasTitle,
           [messageAlign]: messageAlign
         });
-        const content2 = isFunction(message) ? message() : message;
-        if (allowHtml && typeof content2 === "string") {
+        const content = isFunction(message) ? message() : message;
+        if (allowHtml && typeof content === "string") {
           return vue.createVNode("div", {
             "class": classNames,
-            "innerHTML": content2
+            "innerHTML": content
           }, null);
         }
         return vue.createVNode("div", {
           "class": classNames
-        }, [content2]);
+        }, [content]);
       };
       const renderContent = () => {
         if (slots.default) {
@@ -35122,26 +35466,26 @@ ${o3}
       const calcEllipsisText = (container, maxHeight) => {
         var _a, _b;
         const {
-          content: content2,
+          content,
           position,
           dots
         } = props2;
-        const end2 = content2.length;
+        const end2 = content.length;
         const middle = 0 + end2 >> 1;
         const actionHTML = slots.action ? (_b = (_a = actionRef.value) == null ? void 0 : _a.outerHTML) != null ? _b : "" : props2.expandText;
         const calcEllipse = () => {
           const tail = (left2, right2) => {
             if (right2 - left2 <= 1) {
               if (position === "end") {
-                return content2.slice(0, left2) + dots;
+                return content.slice(0, left2) + dots;
               }
-              return dots + content2.slice(right2, end2);
+              return dots + content.slice(right2, end2);
             }
             const middle2 = Math.round((left2 + right2) / 2);
             if (position === "end") {
-              container.innerText = content2.slice(0, middle2) + dots;
+              container.innerText = content.slice(0, middle2) + dots;
             } else {
-              container.innerText = dots + content2.slice(middle2, end2);
+              container.innerText = dots + content.slice(middle2, end2);
             }
             container.innerHTML += actionHTML;
             if (container.offsetHeight > maxHeight) {
@@ -35159,7 +35503,7 @@ ${o3}
         };
         const middleTail = (leftPart, rightPart) => {
           if (leftPart[1] - leftPart[0] <= 1 && rightPart[1] - rightPart[0] <= 1) {
-            return content2.slice(0, leftPart[0]) + dots + content2.slice(rightPart[1], end2);
+            return content.slice(0, leftPart[0]) + dots + content.slice(rightPart[1], end2);
           }
           const leftMiddle = Math.floor((leftPart[0] + leftPart[1]) / 2);
           const rightMiddle = Math.ceil((rightPart[0] + rightPart[1]) / 2);
@@ -35740,15 +36084,15 @@ ${o3}
             onAfterRead(fileList);
           });
         } else {
-          readFileContent(files, resultType).then((content2) => {
+          readFileContent(files, resultType).then((content) => {
             const result = {
               file: files,
               status: "",
               message: "",
               objectUrl: URL.createObjectURL(files)
             };
-            if (content2) {
-              result.content = content2;
+            if (content) {
+              result.content = content;
             }
             onAfterRead(result);
           });

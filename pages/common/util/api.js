@@ -1,6 +1,7 @@
 import {
 	request,
-	requestPromise
+	requestPromise,
+	singleFile
 } from "/pages/common/util/request.js"
 // ============================ 点赞模块 =================================
 /**
@@ -226,4 +227,53 @@ export const unattentionUser = async (myId, otherId) => {
  */
 export const unattentionUserAfter = (fansList, myInfo) => {
 	return fansList.filter(fan => fan.userId !== myInfo.userId)
+}
+
+/**
+ * @description 用户退出登录
+ */
+export const logout = () => {
+	return request(`/user/logout`, "DELETE", null)
+}
+
+/**
+ * @description 记录访客记录
+ * @param userId 被访问者的id
+ */
+export const visitLog = (userId) => {
+	return requestPromise(`/visit/addVisit?visitedId=${userId}`, "PUT", null)
+}
+
+/**
+ * @description 查询访客记录
+ * @param userId 当前登录用户的id
+ */
+export const queryVisit = (userId) => {
+	return requestPromise('/visit/queryVisit', "GET", null)
+}
+
+// ============================ 文件上传模块 =================================
+/**
+ * @description 上传单个文件
+ * @paam file 文件对象
+ */
+export const uploadSingleFile = async (file) => {
+	return await singleFile("/message/uploadImage", file)
+}
+
+// ============================ 聊天记录模块 =================================
+/**
+ * @description 查询聊天记录
+ * @paam otherId 单聊对面用户id
+ */
+export const queryChatMessage = async (otherId) => {
+	return await requestPromise(`/message/queryMessage?otherId=${otherId}`, "GET", null)
+}
+
+/**
+ * @description 把聊天记录标为已读
+ * @paam otherId 单聊对面用户id
+ */
+export const read = async (otherId) => {
+	return await requestPromise(`/message/read?otherId=${otherId}`, "PUT", null)
 }
