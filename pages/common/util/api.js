@@ -277,3 +277,17 @@ export const queryChatMessage = async (otherId) => {
 export const read = async (otherId) => {
 	return await requestPromise(`/message/read?otherId=${otherId}`, "PUT", null)
 }
+
+/**
+ * @description 查询聊天消息列表
+ */
+export const queryMessageList = async () => {
+	return await requestPromise(`/message/queryMessageList`, "GET", null)
+}
+
+/**
+ * @description 查询未读消息数量
+ */
+export const queryUnReadMessage = async () => {
+	return await requestPromise(`/message/queryUnReadMessage`, "GET", null)
+}

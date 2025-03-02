@@ -191,6 +191,136 @@ if (uni.restoreGlobal) {
       return this.isConnected;
     }
   }
+  const unlike = async (articleId, publishUserId) => {
+    return await request(`/likes/unlike?articleId=${articleId}&userId=${publishUserId}`, "PUT", null);
+  };
+  const unlikeAfter = (articles, articleId, userId) => {
+    articles.forEach((article) => {
+      if (article.articleId === articleId) {
+        article.like.articleUserVOList = article.like.articleUserVOList.filter((user) => user.userId !== userId);
+        article.like.count--;
+      }
+    });
+    uni.showToast({
+      title: "取消成功"
+    });
+  };
+  const like = async (articleId, publishUserId) => {
+    return await request(`/likes/like?articleId=${articleId}&userId=${publishUserId}`, "PUT", null);
+  };
+  const likeAfter = (articles, articleId, myInfo) => {
+    articles.forEach((article) => {
+      if (article.articleId === articleId) {
+        if (!article.like.articleUserVOList) {
+          article.like.articleUserVOList = [];
+        }
+        article.like.articleUserVOList.push(myInfo);
+        article.like.count++;
+      }
+    });
+    uni.showToast({
+      title: "点赞成功"
+    });
+  };
+  const isLikeInList = (articles, articleId, id) => {
+    for (let article of articles) {
+      if (article.articleId === articleId && article.like.articleUserVOList) {
+        for (let user of article.like.articleUserVOList) {
+          if (user.userId === id) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+  const isLike = (article, id) => {
+    if (article.like.articleUserVOList) {
+      for (let user of article.like.articleUserVOList) {
+        if (user.userId === id) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+  const getAttentionArticle = async () => {
+    return await requestPromise("/article/queryArticleOfAttention", "GET", null);
+  };
+  const getSchoolArticle = async () => {
+    return await requestPromise("/article/queryArticleOfSchool", "GET", null);
+  };
+  const getUserArticle = async (userId) => {
+    let url = userId === null ? `/article/queryArticleByUserId` : `/article/queryArticleByUserId?userId=${userId}`;
+    return await requestPromise(url, "GET", null);
+  };
+  const deleteArticle = async (articleId) => {
+    return await request(`/article/deleteArticleByArticleId?articleId=${articleId}`, "DELETE", null);
+  };
+  const deleteArticleAfter = (articles, articleId) => {
+    return articles.filter((article) => article.articleId !== articleId);
+  };
+  const searchUser = async (content) => {
+    return await request(`/userInfo/queryLikeUser?keyword=${content}`, "GET", null);
+  };
+  const getAttention$1 = async (userId) => {
+    let url = userId === null ? `/friend/attention` : `/friend/attention?userId=${userId}`;
+    return await requestPromise(url, "GET", null);
+  };
+  const getFans$1 = async (userId) => {
+    let url = userId === null ? `/friend/fans` : `/friend/fans?userId=${userId}`;
+    return await requestPromise(url, "GET", null);
+  };
+  const getUserInfo = async (userId) => {
+    let url = userId === null ? `/userInfo/getUserInfoByUserId` : `/userInfo/getUserInfoByUserId?userId=${userId}`;
+    return await requestPromise(url, "GET", null);
+  };
+  const isAttention = (fansList, myId) => {
+    if (fansList) {
+      for (let user of fansList) {
+        if (user.userId === myId) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+  const attentionUser = async (myId, otherId) => {
+    return await request(`/friend/attentionUser?userId=${myId}&otherId=${otherId}`, "PUT", null);
+  };
+  const attentionUserAfter = (fansList, myInfo) => {
+    fansList.push(myInfo);
+  };
+  const unattentionUser = async (myId, otherId) => {
+    return await request(`/friend/unAttentionUser?userId=${myId}&otherId=${otherId}`, "PUT", null);
+  };
+  const unattentionUserAfter = (fansList, myInfo) => {
+    return fansList.filter((fan) => fan.userId !== myInfo.userId);
+  };
+  const logout = () => {
+    return request(`/user/logout`, "DELETE", null);
+  };
+  const visitLog = (userId) => {
+    return requestPromise(`/visit/addVisit?visitedId=${userId}`, "PUT", null);
+  };
+  const queryVisit = (userId) => {
+    return requestPromise("/visit/queryVisit", "GET", null);
+  };
+  const uploadSingleFile = async (file) => {
+    return await singleFile("/message/uploadImage", file);
+  };
+  const queryChatMessage = async (otherId) => {
+    return await requestPromise(`/message/queryMessage?otherId=${otherId}`, "GET", null);
+  };
+  const read$1 = async (otherId) => {
+    return await requestPromise(`/message/read?otherId=${otherId}`, "PUT", null);
+  };
+  const queryMessageList = async () => {
+    return await requestPromise(`/message/queryMessageList`, "GET", null);
+  };
+  const queryUnReadMessage = async () => {
+    return await requestPromise(`/message/queryUnReadMessage`, "GET", null);
+  };
   let phoneNumber = vue.ref("17823257046");
   let password = vue.ref("111111");
   let checkPassword = vue.ref("");
@@ -223,6 +353,13 @@ if (uni.restoreGlobal) {
           uni.switchTab({
             url: "/pages/tabbar/home/home"
           });
+          const count = await queryUnReadMessage();
+          if (count !== 0) {
+            uni.setTabBarBadge({
+              index: 2,
+              text: `${count}`
+            });
+          }
         } else {
           uni.showToast({
             title: data.message,
@@ -245,7 +382,7 @@ if (uni.restoreGlobal) {
         }
       }
     } catch (err) {
-      formatAppLog("log", "at pages/login/login.js:81", err);
+      formatAppLog("log", "at pages/login/login.js:92", err);
     } finally {
       loading.value = false;
     }
@@ -1415,131 +1552,6 @@ if (uni.restoreGlobal) {
     ]);
   }
   const __easycom_1$2 = /* @__PURE__ */ _export_sfc(_sfc_main$E, [["render", _sfc_render$D], ["__scopeId", "data-v-85f34dfc"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-fab/components/uni-fab/uni-fab.vue"]]);
-  const unlike = async (articleId, publishUserId) => {
-    return await request(`/likes/unlike?articleId=${articleId}&userId=${publishUserId}`, "PUT", null);
-  };
-  const unlikeAfter = (articles, articleId, userId) => {
-    articles.forEach((article) => {
-      if (article.articleId === articleId) {
-        article.like.articleUserVOList = article.like.articleUserVOList.filter((user) => user.userId !== userId);
-        article.like.count--;
-      }
-    });
-    uni.showToast({
-      title: "取消成功"
-    });
-  };
-  const like = async (articleId, publishUserId) => {
-    return await request(`/likes/like?articleId=${articleId}&userId=${publishUserId}`, "PUT", null);
-  };
-  const likeAfter = (articles, articleId, myInfo) => {
-    articles.forEach((article) => {
-      if (article.articleId === articleId) {
-        if (!article.like.articleUserVOList) {
-          article.like.articleUserVOList = [];
-        }
-        article.like.articleUserVOList.push(myInfo);
-        article.like.count++;
-      }
-    });
-    uni.showToast({
-      title: "点赞成功"
-    });
-  };
-  const isLikeInList = (articles, articleId, id) => {
-    for (let article of articles) {
-      if (article.articleId === articleId && article.like.articleUserVOList) {
-        for (let user of article.like.articleUserVOList) {
-          if (user.userId === id) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  };
-  const isLike = (article, id) => {
-    if (article.like.articleUserVOList) {
-      for (let user of article.like.articleUserVOList) {
-        if (user.userId === id) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-  const getAttentionArticle = async () => {
-    return await requestPromise("/article/queryArticleOfAttention", "GET", null);
-  };
-  const getSchoolArticle = async () => {
-    return await requestPromise("/article/queryArticleOfSchool", "GET", null);
-  };
-  const getUserArticle = async (userId) => {
-    let url = userId === null ? `/article/queryArticleByUserId` : `/article/queryArticleByUserId?userId=${userId}`;
-    return await requestPromise(url, "GET", null);
-  };
-  const deleteArticle = async (articleId) => {
-    return await request(`/article/deleteArticleByArticleId?articleId=${articleId}`, "DELETE", null);
-  };
-  const deleteArticleAfter = (articles, articleId) => {
-    return articles.filter((article) => article.articleId !== articleId);
-  };
-  const searchUser = async (content) => {
-    return await request(`/userInfo/queryLikeUser?keyword=${content}`, "GET", null);
-  };
-  const getAttention$1 = async (userId) => {
-    let url = userId === null ? `/friend/attention` : `/friend/attention?userId=${userId}`;
-    return await requestPromise(url, "GET", null);
-  };
-  const getFans$1 = async (userId) => {
-    let url = userId === null ? `/friend/fans` : `/friend/fans?userId=${userId}`;
-    return await requestPromise(url, "GET", null);
-  };
-  const getUserInfo = async (userId) => {
-    let url = userId === null ? `/userInfo/getUserInfoByUserId` : `/userInfo/getUserInfoByUserId?userId=${userId}`;
-    return await requestPromise(url, "GET", null);
-  };
-  const isAttention = (fansList, myId) => {
-    if (fansList) {
-      for (let user of fansList) {
-        if (user.userId === myId) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-  const attentionUser = async (myId, otherId) => {
-    return await request(`/friend/attentionUser?userId=${myId}&otherId=${otherId}`, "PUT", null);
-  };
-  const attentionUserAfter = (fansList, myInfo) => {
-    fansList.push(myInfo);
-  };
-  const unattentionUser = async (myId, otherId) => {
-    return await request(`/friend/unAttentionUser?userId=${myId}&otherId=${otherId}`, "PUT", null);
-  };
-  const unattentionUserAfter = (fansList, myInfo) => {
-    return fansList.filter((fan) => fan.userId !== myInfo.userId);
-  };
-  const logout = () => {
-    return request(`/user/logout`, "DELETE", null);
-  };
-  const visitLog = (userId) => {
-    return requestPromise(`/visit/addVisit?visitedId=${userId}`, "PUT", null);
-  };
-  const queryVisit = (userId) => {
-    return requestPromise("/visit/queryVisit", "GET", null);
-  };
-  const uploadSingleFile = async (file) => {
-    return await singleFile("/message/uploadImage", file);
-  };
-  const queryChatMessage = async (otherId) => {
-    return await requestPromise(`/message/queryMessage?otherId=${otherId}`, "GET", null);
-  };
-  const read$1 = async (otherId) => {
-    return await requestPromise(`/message/read?otherId=${otherId}`, "PUT", null);
-  };
-  let currentTime = null;
   const userInfoProgress = () => {
     const user = uni.getStorageSync("user");
     const totle = Object.keys(user).length - 6;
@@ -1570,7 +1582,7 @@ if (uni.restoreGlobal) {
     second = second < 10 ? "0" + second : second;
     return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   };
-  function relativeTime(timeString, keyword) {
+  function relativeTime(timeString) {
     const date1 = new Date(formatDate(timeString));
     const date2 = /* @__PURE__ */ new Date();
     const diffMs = date2 - date1;
@@ -1602,10 +1614,7 @@ if (uni.restoreGlobal) {
         result = `${year}/${month}/${day} ${hours}:${minutes}`;
       }
     }
-    if (keyword === "other") {
-      return result;
-    }
-    return result === currentTime ? "" : currentTime = result;
+    return result;
   }
   function isToday(date) {
     const today = /* @__PURE__ */ new Date();
@@ -6151,11 +6160,14 @@ ${o3}
     ], 8, ["hover-class"]);
   }
   const __easycom_2 = /* @__PURE__ */ _export_sfc(_sfc_main$B, [["render", _sfc_render$A], ["__scopeId", "data-v-20df4ef0"], ["__file", "E:/code/design/client/CampusMarket/uni_modules/uni-list/components/uni-list-chat/uni-list-chat.vue"]]);
-  const toOtherPage$4 = (name2) => {
+  const toOtherPage$4 = (name2, role, permission, param) => {
     formatAppLog("log", "at pages/tabbar/message/message.js:4", "点击");
     const routes = {
-      "chat": "/pages/message/chat/chat"
+      "chat": `/pages/message/chat/chat?role=${role}&permission=${permission}`
     };
+    if (name2 === "chat") {
+      uni.setStorageSync("chatUser", param);
+    }
     const url = routes[`${name2}`];
     uni.navigateTo({
       url
@@ -6166,6 +6178,10 @@ ${o3}
     setup(__props, { expose: __expose }) {
       __expose();
       let currentOption = vue.ref(0);
+      let messageList = vue.ref([]);
+      onShow(async () => {
+        messageList.value = await queryMessageList();
+      });
       const setCurrentOption = (index) => {
         currentOption.value = index;
       };
@@ -6176,6 +6192,10 @@ ${o3}
         return currentOption;
       }, set currentOption(v2) {
         currentOption = v2;
+      }, get messageList() {
+        return messageList;
+      }, set messageList(v2) {
+        messageList = v2;
       }, setCurrentOption, onSwiperChange, get toOtherPage() {
         return toOtherPage$4;
       }, ref: vue.ref, get relativeTime() {
@@ -6184,12 +6204,15 @@ ${o3}
         return onShow;
       }, get onLoad() {
         return onLoad;
+      }, get queryMessageList() {
+        return queryMessageList;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;
     }
   };
   function _sfc_render$z(_ctx, _cache, $props, $setup, $data, $options) {
+    const _component_van_empty = vue.resolveComponent("van-empty");
     const _component_uni_list_chat = resolveEasycom(vue.resolveDynamicComponent("uni-list-chat"), __easycom_2);
     return vue.openBlock(), vue.createElementBlock("view", { class: "message" }, [
       vue.createElementVNode("view", { class: "title" }, [
@@ -6248,22 +6271,27 @@ ${o3}
                 "scroll-y": "true",
                 class: "userList"
               }, [
-                (vue.openBlock(), vue.createElementBlock(
+                $setup.messageList === null ? (vue.openBlock(), vue.createBlock(_component_van_empty, {
+                  key: 0,
+                  description: "这里空空如也"
+                })) : vue.createCommentVNode("v-if", true),
+                (vue.openBlock(true), vue.createElementBlock(
                   vue.Fragment,
                   null,
-                  vue.renderList(2, (item) => {
-                    return vue.createVNode(_component_uni_list_chat, {
-                      title: "uni-app",
+                  vue.renderList($setup.messageList, (message, index) => {
+                    return vue.openBlock(), vue.createBlock(_component_uni_list_chat, {
+                      key: message.userId,
+                      title: message.userName,
                       clickable: "",
-                      onClick: _cache[2] || (_cache[2] = ($event) => $setup.toOtherPage("chat")),
-                      avatar: "https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png",
-                      note: "您收到一条新的消息",
-                      time: "2020-02-02 20:20",
-                      "badge-text": "12"
-                    });
+                      onClick: ($event) => $setup.toOtherPage("chat", "me", "update", { userId: message.userId, userAvatar: message.userAvatar, userName: message.userName }),
+                      avatar: message.userAvatar,
+                      note: message.userId === message.sendUserId ? message.type === "text" ? message.content : "[图片]" : message.type === "text" ? `我:${message.content}` : `我:[图片]`,
+                      time: $setup.relativeTime(message.createTime, "other"),
+                      "badge-text": message.unReadMessageCount
+                    }, null, 8, ["title", "onClick", "avatar", "note", "time", "badge-text"]);
                   }),
-                  64
-                  /* STABLE_FRAGMENT */
+                  128
+                  /* KEYED_FRAGMENT */
                 ))
               ])
             ])
@@ -6324,10 +6352,6 @@ ${o3}
       let isLoading2 = vue.ref(false);
       let visitCount = vue.ref(null);
       onLoad(async (e2) => {
-        const user = uni.getStorageSync("user");
-        userAvatar.value = user.userAvatar;
-        userName2.value = user.userName;
-        isAdmin.value = user.isAdmin;
         try {
           isLoading2.value = true;
           const [res1, res2, res3, res4, res5] = await Promise.all([
@@ -6344,12 +6368,16 @@ ${o3}
           attentionFans.value = res4;
           visitCount.value = res5 ? res5.length : "";
         } catch (err) {
-          formatAppLog("log", "at pages/tabbar/my/my.vue:115", err);
+          formatAppLog("log", "at pages/tabbar/my/my.vue:110", err);
         } finally {
           isLoading2.value = false;
         }
       });
       onShow(async () => {
+        const user = uni.getStorageSync("user");
+        userAvatar.value = user.userAvatar;
+        userName2.value = user.userName;
+        isAdmin.value = user.isAdmin;
         try {
           const [res1, res2, res3, res4] = await Promise.all([
             getArticle(),
@@ -18350,7 +18378,7 @@ ${o3}
               title: user.userName,
               avatar: user.userAvatar,
               note: user.userProfile ?? "",
-              time: $setup.relativeTime(user.visitTime, "other"),
+              time: user.visitTime ? $setup.relativeTime(user.visitTime, "other") : "",
               onClick: ($event) => $setup.onClick(user.userId)
             }, null, 8, ["title", "avatar", "note", "time", "onClick"]);
           }),
@@ -18374,7 +18402,7 @@ ${o3}
       let title = vue.ref(uni.getStorageSync("chatUser").userName);
       let scrollIntoId = vue.ref("");
       let content = vue.ref("");
-      let messages2 = vue.ref([]);
+      let messages2 = vue.ref(null);
       let isLoading2 = vue.ref(false);
       let socket = getApp().globalData.sockets[`${myId.value}`];
       onLoad(async (e2) => {
@@ -18383,8 +18411,13 @@ ${o3}
         uni.setNavigationBarTitle({
           title: title.value
         });
-        messages2.value = await queryChatMessage(otherId.value);
-        await read$1(otherId.value);
+        const [res1, res2] = await Promise.all([
+          // 查询聊天记录
+          queryChatMessage(otherId.value),
+          // 把消息标为已读
+          read$1(otherId.value)
+        ]);
+        messages2.value = res1;
         scrollIntoId.value = `message${messages2.value.length - 1}`;
         socket.setOneByOne(otherId.value);
       });
@@ -18414,7 +18447,7 @@ ${o3}
                 send("image");
               }
             } catch (err) {
-              formatAppLog("log", "at pages/message/chat/chat.vue:113", err);
+              formatAppLog("log", "at pages/message/chat/chat.vue:118", err);
             }
           }
         });
@@ -18522,7 +18555,7 @@ ${o3}
                     vue.createElementVNode(
                       "text",
                       null,
-                      vue.toDisplayString($setup.relativeTime(message.createTime)),
+                      vue.toDisplayString(index === 0 ? $setup.relativeTime(message.createTime) : message.createTime === $setup.messages[index - 1].createTime ? "" : $setup.relativeTime(message.createTime)),
                       1
                       /* TEXT */
                     )
@@ -19112,7 +19145,6 @@ ${o3}
           app.globalData = {};
         }
         app.globalData.sockets = sockets;
-        formatAppLog("log", "at App.vue:14", "App Launch");
       });
       uni.$on("websocketMessage", (message) => {
         const data = JSON.parse(message);
@@ -27987,9 +28019,9 @@ ${o3}
     }
   });
   const ContactList = withInstall(stdin_default$_);
-  function parseFormat(format2, currentTime2) {
-    const { days } = currentTime2;
-    let { hours, minutes, seconds, milliseconds } = currentTime2;
+  function parseFormat(format2, currentTime) {
+    const { days } = currentTime;
+    let { hours, minutes, seconds, milliseconds } = currentTime;
     if (format2.includes("DD")) {
       format2 = format2.replace("DD", padZero(days));
     } else {

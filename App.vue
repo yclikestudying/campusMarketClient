@@ -11,7 +11,6 @@
 	    app.globalData = {};
 	  }
 	  app.globalData.sockets = sockets;
-	  console.log('App Launch');
 	});
 	
 	uni.$on('websocketMessage', (message) => {

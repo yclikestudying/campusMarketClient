@@ -91,11 +91,6 @@
 	let visitCount = ref(null); // 访客数量
 
 	onLoad(async (e) => {
-		// 本地缓存获取用户信息
-		const user = uni.getStorageSync("user")
-		userAvatar.value = user.userAvatar
-		userName.value = user.userName
-		isAdmin.value = user.isAdmin
 		try {
 			isLoading.value = true
 			const [res1, res2, res3, res4, res5] = await Promise.all([
@@ -119,6 +114,11 @@
 	})
 
 	onShow(async () => {
+		// 本地缓存获取用户信息
+		const user = uni.getStorageSync("user")
+		userAvatar.value = user.userAvatar
+		userName.value = user.userName
+		isAdmin.value = user.isAdmin
 		try {
 			const [res1, res2, res3, res4] = await Promise.all([
 				getArticle(),

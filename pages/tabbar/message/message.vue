@@ -19,10 +19,14 @@
 				<swiper-item>
 					<view class="swiper-item">
 						<scroll-view scroll-y="true" class="userList">
-							<template v-for="item in 2">
-								<uni-list-chat title="uni-app" clickable @click="toOtherPage('chat')"
-									avatar="https://qiniu-web-assets.dcloud.net.cn/unidoc/zh/unicloudlogo.png"
-									note="您收到一条新的消息" time="2020-02-02 20:20" badge-text="12"></uni-list-chat>
+							<van-empty v-if="messageList === null" description="这里空空如也" />
+							<template v-for="(message, index) in messageList" :key="message.userId">
+								<uni-list-chat :title="message.userName" clickable
+									@click="toOtherPage('chat', 'me', 'update', {userId:message.userId, userAvatar:message.userAvatar, userName:message.userName})"
+									:avatar="message.userAvatar"
+									:note="message.userId === message.sendUserId ? message.type === 'text' ? message.content : '[图片]' :  message.type === 'text' ? `我:${message.content}` : `我:[图片]`"
+									:time="relativeTime(message.createTime, 'other')"
+									:badge-text="message.unReadMessageCount"></uni-list-chat>
 							</template>
 						</scroll-view>
 					</view>
@@ -53,9 +57,18 @@
 		onShow,
 		onLoad
 	} from "@dcloudio/uni-app"
+	import {
+		queryMessageList
+	} from "/pages/common/util/api.js"
 
 	// 数据
 	let currentOption = ref(0)
+	let messageList = ref([]); // 消息列表
+	
+
+	onShow(async () => {
+		messageList.value = await queryMessageList()
+	})
 
 	// 设置新的currentOption
 	const setCurrentOption = (index) => {

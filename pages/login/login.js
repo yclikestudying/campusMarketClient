@@ -6,6 +6,9 @@ import {
 	request
 } from "/pages/common/util/request.js"
 import WebSocketClient from "/pages/common/util/socket.js"
+import {
+	queryUnReadMessage
+} from "/pages/common/util/api.js"
 
 // 数据变量
 export let phoneNumber = ref('17823257046'); // 手机号码
@@ -55,6 +58,14 @@ export const onSubmit = async () => {
 				uni.switchTab({
 					url: "/pages/tabbar/home/home"
 				})
+				
+				const count = await queryUnReadMessage()
+				if (count !== 0) {
+					uni.setTabBarBadge({
+						index: 2,
+						text: `${count}`
+					})
+				}		
 			} else {
 				uni.showToast({
 					title: data.message,
@@ -83,5 +94,4 @@ export const onSubmit = async () => {
 		// 关闭加载状态
 		loading.value = false
 	}
-
 }

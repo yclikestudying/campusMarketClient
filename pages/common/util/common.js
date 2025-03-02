@@ -1,5 +1,3 @@
-let currentTime = null
-
 /**
  * 计算用户信息的完善情况
  */
@@ -12,7 +10,8 @@ export const userInfoProgress = () => {
 			count++;
 			continue;
 		}
-		if (item !== "createTime" && item !== 'userId' && item !== 'userAvatar' && item !== 'isAdmin' && item !== 'userPhone' && item !== "userPassword" && user[`${item}`] !== null) {
+		if (item !== "createTime" && item !== 'userId' && item !== 'userAvatar' && item !== 'isAdmin' && item !==
+			'userPhone' && item !== "userPassword" && user[`${item}`] !== null) {
 			count++;
 		}
 	}
@@ -43,7 +42,7 @@ export const formatDate = (time) => {
 /**
  * 聊天页面的时间展示（仿腾讯 QQ，今天显示“今天 HH:mm”）
  */
-export function relativeTime(timeString, keyword) {
+export function relativeTime(timeString) {
 	const date1 = new Date(formatDate(timeString)); // 传入的时间
 	const date2 = new Date(); // 当前时间
 	const diffMs = date2 - date1; // 时间差（毫秒）
@@ -88,17 +87,13 @@ export function relativeTime(timeString, keyword) {
 		}
 	}
 
-	if (keyword === 'other') {
-		return result;
-	}
-
-	return result === currentTime ? '' : (currentTime = result);
+	return result;
 }
 
 /**
  * 判断日期是否是今天
  */
-function isToday(date) {
+export function isToday(date) {
 	const today = new Date();
 	return (
 		date.getFullYear() === today.getFullYear() &&
