@@ -5,9 +5,9 @@
 				:scroll-into-view="scrollIntoId">
 				<template v-if="messages !== null" v-for="(message, index) in messages">
 					<view class="date">
-						<text>{{ index === 0 ? relativeTime(message.createTime) : (message.createTime === messages[index - 1].createTime ? '' : relativeTime(message.createTime)) }}</text>
+						<text>{{ index === 0 ? formatWeChatTime(message.createTime) : (message.createTime === messages[index - 1].createTime ? '' : formatWeChatTime(message.createTime)) }}</text>
 					</view>
-					<view :id="index === messages.length - 1 ? `message${index}` : ''"
+					<view :id="index === messages?.length - 1 ? `message${index}` : ''"
 						:class="{user: true, me: message.sendUserId === myId}">
 						<view class="image">
 							<image class="avatar" lazy-load="true"
@@ -15,6 +15,9 @@
 						</view>
 						<view v-if="message.type === 'text'" class="message">
 							<text>{{ message.content }}</text>
+						</view>
+						<view v-else-if="message.type === 'link'" class="message" @click="checkGoods(message.content)">
+							<text style="color: blue;">{{ message.content }}</text>
 						</view>
 						<view v-else class="messageImage"
 							@click="toOtherPage('image', role, permission, message.content, 'image')">
@@ -42,7 +45,7 @@
 		onShow
 	} from '@dcloudio/uni-app'
 	import {
-		relativeTime
+		formatWeChatTime
 	} from "/pages/common/util/common.js"
 	import {
 		uploadSingleFile,
@@ -60,33 +63,35 @@
 	let title = ref(uni.getStorageSync("chatUser").userName)
 	let scrollIntoId = ref('');
 	let content = ref(''); // 发送的消息内容
-	let messages = ref(null); // 聊天记录
+	let messages = ref([]); // 聊天记录
 	let isLoading = ref(false); // 是否开启动画滚动
 	let socket = getApp().globalData.sockets[`${myId.value}`]; // websocket实例
 
 	onLoad(async (e) => {
 		role.value = e.role
 		permission.value = e.permission
+		if (e.goodsId) {
+			content.value = `点击跳转商品详情页?id=${Number(e.goodsId)}`
+			send('link')
+			content.value = ''
+		}
 		uni.setNavigationBarTitle({
 			title: title.value
 		})
 
-
-		const [res1, res2] = await Promise.all([
-			// 查询聊天记录
-			queryChatMessage(otherId.value),
-			// 把消息标为已读
-			read(otherId.value)
-		])
 		// 查询聊天记录
-		messages.value = res1  
-		scrollIntoId.value = `message${messages.value.length - 1}`
+		messages.value = await queryChatMessage(otherId.value)
+		// 清空未读消息
+		await read(otherId.value)
+		scrollIntoId.value = `message${messages?.value?.length - 1}`
 		// 记录当前用户的id
 		socket.setOneByOne(otherId.value)
 	})
 
 	watch(messages, (value) => {
-		scrollIntoId.value = `message${value.length - 1}`
+		if (value && value.length > 0) {
+			scrollIntoId.value = `message${value.length - 1}`;
+		}
 	})
 
 	// 发送文本消息
@@ -140,54 +145,14 @@
 			url: url
 		})
 	}
-	
-	// function relativeTime(timeString) {
-	// 	const date1 = new Date(formatDate(timeString)); // 传入的时间
-	// 	const date2 = new Date(); // 当前时间
-	// 	const diffMs = date2 - date1; // 时间差（毫秒）
-	
-	// 	const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)); // 相差天数
-	
-	// 	// 星期几的映射
-	// 	const weekDays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
-	
-	// 	let result;
-	
-	// 	if (isToday(date1)) {
-	// 		// 如果是今天，显示“今天 HH:mm”
-	// 		const hours = String(date1.getHours()).padStart(2, '0'); // 补零
-	// 		const minutes = String(date1.getMinutes()).padStart(2, '0'); // 补零
-	// 		result = `今天 ${hours}:${minutes}`;
-	// 	} else if (diffDays === 1) {
-	// 		// 昨天
-	// 		const yesterdayHours = String(date1.getHours()).padStart(2, '0'); // 昨天的小时数
-	// 		const yesterdayMinutes = String(date1.getMinutes()).padStart(2, '0'); // 昨天的分钟数
-	// 		result = `昨天 ${yesterdayHours}:${yesterdayMinutes}`;
-	// 	} else if (diffDays < 7) {
-	// 		// 本周内，显示星期几
-	// 		const dayOfWeek = weekDays[date1.getDay()]; // 获取星期几
-	// 		const hours = String(date1.getHours()).padStart(2, '0'); // 补零
-	// 		const minutes = String(date1.getMinutes()).padStart(2, '0'); // 补零
-	// 		result = `${dayOfWeek} ${hours}:${minutes}`;
-	// 	} else {
-	// 		// 超过一周，显示具体日期
-	// 		const year = date1.getFullYear();
-	// 		const month = String(date1.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要加1
-	// 		const day = String(date1.getDate()).padStart(2, '0'); // 补零
-	// 		const hours = String(date1.getHours()).padStart(2, '0'); // 补零
-	// 		const minutes = String(date1.getMinutes()).padStart(2, '0'); // 补零
-	
-	// 		if (date1.getFullYear() === date2.getFullYear()) {
-	// 			// 未跨年
-	// 			result = `${month}/${day} ${hours}:${minutes}`;
-	// 		} else {
-	// 			// 跨年
-	// 			result = `${year}/${month}/${day} ${hours}:${minutes}`;
-	// 		}
-	// 	}
-	
-	// 	return result === currentTime ? '' : (currentTime = result);
-	// }
+
+	// 查看商品详情
+	const checkGoods = (content) => {
+		const id = content.match(/=(\d+)/)[1];
+		uni.navigateTo({
+			url: `/pages/goods/goods?goodsId=${Number(id)}`
+		})
+	}
 </script>
 
 <style lang="less" scoped>

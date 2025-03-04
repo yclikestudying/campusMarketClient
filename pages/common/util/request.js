@@ -38,7 +38,7 @@ export const requestPromise = async (url, method, data) => {
 }
 
 /**
- * 上传单个文件
+ * 上传不带内容的文件
  */
 export const singleFile = async (url, filePath) => {
 	return await uni.uploadFile({
@@ -52,7 +52,7 @@ export const singleFile = async (url, filePath) => {
 }
 
 /**
- * 上传多个文件
+ * 上传带一个内容的文件
  */
 export const moreFile = async (url, files, textContent) => {
 	return await uni.uploadFile({
@@ -60,6 +60,23 @@ export const moreFile = async (url, files, textContent) => {
 		files: files,
 		formData: {
 			"text": textContent // 文本内容
+		},
+		header: {
+			"Authorization": uni.getStorageSync("token")
+		}
+	})
+}
+
+/**
+ * @description 上传带两个内容的文件
+ */
+export const uploadFile = async (url, files, textContent, price) => {
+	return await uni.uploadFile({
+		url: `${baseURL}${url}`,
+		files: files,
+		formData: {
+			"text": textContent ,// 文本内容
+			"price": price
 		},
 		header: {
 			"Authorization": uni.getStorageSync("token")

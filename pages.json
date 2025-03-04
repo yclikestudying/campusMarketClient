@@ -91,7 +91,7 @@
 		{
 			"path": "pages/home/express/express",
 			"style": {
-				"navigationBarTitleText": "快递代取",
+				"navigationBarTitleText": "跑腿服务",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {
@@ -335,6 +335,22 @@
 			"path": "pages/article/article",
 			"style": {
 				"navigationBarTitleText": "动态详情",
+				"animationType": "slide-in-right",
+				"animationDuration": 300,
+				"app-plus": {
+					"bounce": "none",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"backgroundColor": "#ffffff"
+					}
+				}
+			}
+		},
+		{
+			"path" : "pages/goods/goods",
+			"style" : 
+			{
+				"navigationBarTitleText" : "商品详情",
 				"animationType": "slide-in-right",
 				"animationDuration": 300,
 				"app-plus": {

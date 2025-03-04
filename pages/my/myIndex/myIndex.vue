@@ -22,7 +22,8 @@
 							size="mini" @click="unattention">已关注</van-button>
 						<van-button v-else style="width: 40px;background-color: #FEE802;border: none;color: black;"
 							type="primary" size="mini" @click="attention">关注</van-button>
-						<uni-icons type="chat" size="30" @click="toOtherPage('chat', 'me', 'update', {userId: user.userId, userAvatar: user.userAvatar, userName:user.userName})"></uni-icons>
+						<uni-icons type="chat" size="30"
+							@click="toOtherPage('chat', 'me', 'update', {userId: user.userId, userAvatar: user.userAvatar, userName:user.userName})"></uni-icons>
 					</view>
 				</view>
 				<view class="name">
@@ -40,7 +41,7 @@
 						<text>{{ fansList?.length ?? 0 }}</text>
 						<text>粉丝</text>
 					</view>
-<!-- 					<view class="data-item">
+					<!-- 					<view class="data-item">
 						<text>4</text>
 						<text>访客</text>
 					</view> -->
@@ -86,7 +87,7 @@
 					</view>
 				</view>
 				<view class="option-item" @click="setCurrentOption(3)">
-					<text :class="{'active-option-name': currentOption === 3}">代取</text>
+					<text :class="{'active-option-name': currentOption === 3}">跑腿</text>
 					<view class="underline">
 
 					</view>
@@ -98,7 +99,7 @@
 						<view class="swiper-item">
 							<scroll-view :scroll-y="isScroll" class="page">
 								<TopLoading v-if="isLoading" des="主页加载中..."></TopLoading>
-								<van-empty v-else-if="!isLoading && articles.length === 0" description="暂无数据" />
+								<van-empty v-else-if="!isLoading && articles.length === 0" description="这里空空如也~" />
 								<text v-else>主页</text>
 							</scroll-view>
 						</view>
@@ -107,7 +108,7 @@
 						<view class="swiper-item">
 							<scroll-view :scroll-y="isScroll" class="page">
 								<TopLoading v-if="isLoading" des="动态加载中..."></TopLoading>
-								<van-empty v-else-if="!isLoading && articles.length === 0" description="暂无数据" />
+								<van-empty v-else-if="!isLoading && articles.length === 0" description="这里空空如也~" />
 								<template v-else v-for="(article, index) in articles" :key="article.articleId">
 									<view class="article">
 										<view class="userInfo">
@@ -121,7 +122,7 @@
 														@click="deleteByArticleId(article.articleId)"></uni-icons>
 												</view>
 												<view class="bottom">
-													<text>{{ relativeTime(article.createTime, 'other') }}</text>
+													<text>{{ formatWeChatTime(article.createTime, 'other') }}</text>
 												</view>
 											</view>
 										</view>
@@ -155,17 +156,78 @@
 						<view class="swiper-item">
 							<scroll-view :scroll-y="isScroll" class="page">
 								<TopLoading v-if="isLoading" des="商品加载中..."></TopLoading>
-								<van-empty v-else-if="!isLoading && articles.length === 0" description="暂无数据" />
-								<text v-else>商品</text>
+								<van-empty v-else-if="!isLoading && goods.length === 0" description="这里空空如也~" />
+								<template v-for="(good, index) in goods" :key="good.id">
+									<view class="article">
+										<view class="userInfo">
+											<view class="avatar">
+												<image :src="user.userAvatar" mode=""></image>
+											</view>
+											<view class="right">
+												<view class="top">
+													<text>{{ user.userName }}</text>
+													<uni-icons v-if="permission === 'update'" type="trash" size="25"
+														@click="deleteGoods(good.id)"></uni-icons>
+												</view>
+												<view class="bottom">
+													<text>{{ formatWeChatTime(good.createTime) }}</text>
+												</view>
+											</view>
+										</view>
+										<view class="text">
+											<text>{{ good.goodsContent }}</text>
+										</view>
+										<view class="image">
+											<template v-for="(photo, index) in JSON.parse(good.goodsPhotos)">
+												<view class="photo"
+													@click.stop="toOtherPage('image', role, permission, photo, 'photo')">
+													<image :src="photo" mode=""></image>
+												</view>
+											</template>
+										</view>
+										<view class="function">
+											<view class="price">
+												<text>￥{{ good.goodsPrice }}</text>
+											</view>
+										</view>
+									</view>
+								</template>
 							</scroll-view>
 						</view>
 					</swiper-item>
 					<swiper-item>
 						<view class="swiper-item">
 							<scroll-view :scroll-y="isScroll" class="page">
-								<TopLoading v-if="isLoading" des="代取加载中..."></TopLoading>
-								<van-empty v-else-if="!isLoading && articles.length === 0" description="暂无数据" />
-								<text v-else>代取</text>
+								<TopLoading v-if="isLoading" des="跑腿加载中..."></TopLoading>
+								<van-empty v-else-if="!isLoading && express.length === 0" description="这里空空如也~" />
+								<template v-for="(item, index) in express" :key="item.id">
+									<view class="article">
+										<view class="userInfo">
+											<view class="avatar"
+												@click="toOtherPage('myIndex', 'other', 'read', user.userId)">
+												<image :src="user.userAvatar" mode=""></image>
+											</view>
+											<view class="right">
+												<view class="top">
+													<text>{{ user.userName }}</text>
+													<uni-icons v-if="permission === 'update'" type="trash" size="25"
+														@click="deleteExpress(item.id)"></uni-icons>
+												</view>
+												<view class="bottom">
+													<text>{{ formatWeChatTime(item.createTime) }}</text>
+												</view>
+											</view>
+										</view>
+										<view class="text">
+											<text>{{ item.expressContent }}</text>
+										</view>
+										<view class="function">
+											<view class="price">
+												<text>￥{{ item.expressPrice }}</text>
+											</view>
+										</view>
+									</view>
+								</template>
 							</scroll-view>
 						</view>
 					</swiper-item>
@@ -185,6 +247,7 @@
 	import {
 		formatDate,
 		relativeTime,
+		formatWeChatTime,
 		userInfoProgress
 	} from "../../common/util/common.js"
 	import {
@@ -207,7 +270,11 @@
 		unattentionUser,
 		attentionUserAfter,
 		unattentionUserAfter,
-		visitLog
+		visitLog,
+		queryGoods,
+		deleteByGoodsId,
+		queryMyExpress,
+		deleteExpressById
 	} from "/pages/common/util/api.js"
 
 	// 数据
@@ -220,7 +287,9 @@
 	let otherId = ref(null); // 进入其他用户主页时他们的id
 	let attentionList = ref(null); // 当前用户的关注
 	let fansList = ref([]); // 当前用户的粉丝
-	let articles = ref([]); // 动态
+	let articles = ref([]); // 动态集合
+	let goods = ref([]); // 商品集合
+	let express = ref([]); // 跑腿集合
 	let isLoading = ref(false); // 是否开启加载动画
 	let isScroll = ref(false); // 滚动监听
 	let myInfo = ref({
@@ -231,7 +300,7 @@
 	})
 	let socket = getApp().globalData.sockets[`${myId.value}`]; // websocket实例
 
-	onLoad(async(e) => {
+	onLoad(async (e) => {
 		role.value = e.role
 		permission.value = e.permission
 		if (e.userId) {
@@ -241,17 +310,23 @@
 		if (role.value === 'me') {
 			try {
 				// 并发请求
-				const [res1, res2, res3] = await Promise.all([
+				const [res1, res2, res3, res4, res5] = await Promise.all([
 					// 获取关注数量
 					getAttention(null),
 					// 获取粉丝数量
 					getFans(null),
 					// 获取用户动态信息
-					getUserArticle(null)
+					getUserArticle(null),
+					// 获取商品信息
+					queryGoods(null),
+					// 获取跑腿信息
+					queryMyExpress(null)
 				])
 				attentionList.value = res1
 				fansList.value = res2 ?? []
 				articles.value = res3 ?? []
+				goods.value = res4 ?? []
+				express.value = res5 ?? []
 			} catch (err) {
 				console.log(err)
 			}
@@ -259,7 +334,7 @@
 			// 如果进入别的用户主页，那么根据id查询他的信息
 			// 并发请求
 			try {
-				const [res1, res2, res3, res4, res5] = await Promise.all([
+				const [res1, res2, res3, res4, res5, res6, res7] = await Promise.all([
 					// 获取关注数量
 					getAttention(otherId.value),
 					// 获取粉丝数量
@@ -269,12 +344,18 @@
 					// 获取用户动态信息
 					getUserArticle(otherId.value),
 					// 记录访客记录
-					visitLog(otherId.value)
+					visitLog(otherId.value),
+					// 获取商品信息
+					queryGoods(otherId.value),
+					// 获取跑腿信息
+					queryMyExpress(otherId.value)
 				])
 				attentionList.value = res1
 				fansList.value = res2 ?? []
 				user.value = res3
 				articles.value = res4 ?? []
+				goods.value = res6 ?? []
+				express.value = res7 ?? []
 				uni.setStorageSync("other", user.value)
 			} catch (err) {
 				console.log(err)
@@ -294,7 +375,7 @@
 			user.value = uni.getStorageSync("user")
 			// 计算基本信息完善程度
 			progress.value = userInfoProgress()
-		}	
+		}
 	})
 
 	// 动态点赞
@@ -362,7 +443,7 @@
 	const scroll = (e) => {
 		isScroll.value = e.detail.scrollTop > 325 ? true : false
 	}
-	
+
 	// 更新动态缓存
 	uni.$on("updateArticles", (article) => {
 		articles.value.forEach(item => {
@@ -379,11 +460,49 @@
 			}
 		})
 	})
-	
+
 	// 删除动态之后更新缓存
 	uni.$on("deleteArticle", (articleId) => {
 		articles.value = articles.value.filter(article => article.articleId !== articleId)
 	})
+
+	// 删除发布的商品
+	const deleteGoods = (goodsId) => {
+		uni.showModal({
+			title: '温馨提示',
+			content: '确认删除该商品吗',
+			success: async function(res) {
+				if (res.confirm) {
+					const res1 = await deleteByGoodsId(goodsId)
+					if (res1.data.code === 200) {
+						goods.value = goods.value.filter(good => good.id !== goodsId)
+						uni.showToast({
+							title: "删除成功"
+						})
+					}
+				}
+			}
+		});
+	}
+	
+	// 删除跑腿服务
+	const deleteExpress = (expressId) => {
+		uni.showModal({
+			title: '温馨提示',
+			content: '确认删除该发布吗',
+			success: async function(res) {
+				if (res.confirm) {
+					const res1 = await deleteExpressById(expressId)
+					if (res1.data.code === 200) {
+						express.value = express.value.filter(item => item.id !== expressId)
+						uni.showToast({
+							title: "删除成功"
+						})
+					}
+				}
+			}
+		});
+	}
 </script>
 <style lang="less" scoped>
 	.myIndex {
@@ -641,6 +760,15 @@
 										display: flex;
 										align-items: center;
 										justify-content: right;
+
+										.price {
+											height: 100%;
+											display: flex;
+											align-items: center;
+											margin-right: 10px;
+											font-size: 20px;
+											color: red;
+										}
 									}
 								}
 							}

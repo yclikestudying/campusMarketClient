@@ -882,6 +882,14 @@
   align-items: center;
   justify-content: right;
 }
+.home .content .share .swiper uni-swiper-item .swiper-item .page .article .function .price[data-v-04814601] {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  font-size: 20px;
+  color: red;
+}
 .active-underline[data-v-04814601] {
   background-color: #FEE802 !important;
 }

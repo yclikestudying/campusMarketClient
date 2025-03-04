@@ -76,7 +76,8 @@
 		onPullDownRefresh
 	} from "@dcloudio/uni-app"
 	import {
-		queryVisit
+		queryVisit,
+		queryUnReadMessage
 	} from "/pages/common/util/api.js"
 
 	// 数据
@@ -132,6 +133,18 @@
 			attentionFans.value = res4
 		} catch (err) {
 			console.log(err)
+		}
+		
+		const count = await queryUnReadMessage()
+		if (count !== 0) {
+			uni.setTabBarBadge({
+				index: 2,
+				text: `${count}`
+			})
+		} else {
+			uni.removeTabBarBadge({
+				index: 2
+			})
 		}
 	})
 </script>

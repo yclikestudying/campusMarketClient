@@ -37,7 +37,7 @@
 						</view>
 					</view>
 					<view class="option-item" @click="setCurrentMenu(2)">
-						<text :class="{'active-optionName': currentMenu === 2}">快递代取</text>
+						<text :class="{'active-optionName': currentMenu === 2}">跑腿服务</text>
 						<view class="underline">
 
 						</view>
@@ -55,7 +55,7 @@
 								:refresher-triggered="isRefreshing" @refresherpulling="onPulling"
 								@refresherrefresh="onRefresh" @refresherrestore="onRestore" @refresherabort="onAbort">
 								<SmallLoading v-if="isLoading"></SmallLoading>
-								<van-empty v-if="articles?.length === 0" description="这里空空如也" />
+								<van-empty v-if="articles?.length === 0" description="这里空空如也~" />
 								<template v-else v-for="(article, index) in articles" :key="article">
 									<view class="article">
 										<view class="userInfo">
@@ -68,7 +68,7 @@
 													<text>{{ article.publishUser.userName }}</text>
 												</view>
 												<view class="bottom">
-													<text>{{ relativeTime(article.createTime, 'other') }}</text>
+													<text>{{ formatWeChatTime(article.createTime, 'other') }}</text>
 												</view>
 											</view>
 										</view>
@@ -100,12 +100,94 @@
 					</swiper-item>
 					<swiper-item>
 						<view class="swiper-item">
-							2
+							<scroll-view :scroll-y="isGoodsScroll" class="page" :refresher-enabled="goodsEnabled"
+								:refresher-triggered="isGoodsRefreshing" @refresherrefresh="onRefresh1"
+								@refresherrestore="onRestore1" @refresherabort="onAbort1">
+								<SmallLoading v-if="isLoading"></SmallLoading>
+								<van-empty v-if="goods?.length === 0" description="这里空空如也~" />
+								<template v-for="(good, index) in goods" :key="good.id">
+									<view class="article">
+										<view class="userInfo">
+											<view class="avatar"
+												@click="toOtherPage('myIndex', 'other', 'read', good.userId)">
+												<image :src="good.userAvatar" mode=""></image>
+											</view>
+											<view class="right">
+												<view class="top">
+													<text>{{ good.userName }}</text>
+												</view>
+												<view class="bottom">
+													<text>{{ formatWeChatTime(good.createTime) }}</text>
+												</view>
+											</view>
+										</view>
+										<view class="text" @click="toOtherPage('goods', null, null, good.id)">
+											<text>{{ good.goodsContent }}</text>
+										</view>
+										<view class="image" @click="toOtherPage('goods', null, null, good.id)">
+											<template v-for="(photo, index) in JSON.parse(good.goodsPhotos)">
+												<view class="photo"
+													@click.stop="toOtherPage('image', role, permission, photo, 'photo')">
+													<image :src="photo" mode=""></image>
+												</view>
+											</template>
+										</view>
+										<view class="function">
+											<view class="price">
+												<text>￥{{ good.goodsPrice }}</text>
+											</view>
+											<view>
+												<van-button
+													style="width: 40px;background-color: #FEE802;border: none;color: black;"
+													type="primary" size="mini"
+													@click="toOtherPage('chat', 'me', 'update', {userId:good.userId, userName:good.userName, userAvatar:good.userAvatar}, null, good.id)">联系我</van-button>
+											</view>
+										</view>
+									</view>
+								</template>
+							</scroll-view>
 						</view>
 					</swiper-item>
 					<swiper-item>
 						<view class="swiper-item">
-							3
+							<scroll-view :scroll-y="isExpressScroll" class="page" :refresher-enabled="expressEnabled"
+								:refresher-triggered="isExpressRefreshing" @refresherrefresh="onRefresh2"
+								@refresherrestore="onRestore2" @refresherabort="onAbort2">
+								<SmallLoading v-if="isLoading"></SmallLoading>
+								<van-empty v-if="express?.length === 0" description="这里空空如也~" />
+								<template v-for="(item, index) in express" :key="item.id">
+									<view class="article">
+										<view class="userInfo">
+											<view class="avatar"
+												@click="toOtherPage('myIndex', 'other', 'read', item.userId)">
+												<image :src="item.userAvatar" mode=""></image>
+											</view>
+											<view class="right">
+												<view class="top">
+													<text>{{ item.userName }}</text>
+												</view>
+												<view class="bottom">
+													<text>{{ formatWeChatTime(item.createTime) }}</text>
+												</view>
+											</view>
+										</view>
+										<view class="text">
+											<text>{{ item.expressContent }}</text>
+										</view>
+										<view class="function">
+											<view class="price">
+												<text>￥{{ item.expressPrice }}</text>
+											</view>
+											<view>
+												<van-button
+													style="width: 40px;background-color: #FEE802;border: none;color: black;"
+													type="primary" size="mini"
+													@click="toOtherPage('chat', 'me', 'update', {userId:item.userId, userName:item.userName, userAvatar:item.userAvatar})">联系我</van-button>
+											</view>
+										</view>
+									</view>
+								</template>
+							</scroll-view>
 						</view>
 					</swiper-item>
 				</swiper>
@@ -131,10 +213,13 @@
 		like,
 		unlike,
 		likeAfter,
-		unlikeAfter
+		unlikeAfter,
+		queryAllGoods,
+		queryAllExpress
 	} from "/pages/common/util/api.js"
 	import {
-		relativeTime
+		relativeTime,
+		formatWeChatTime
 	} from "/pages/common/util/common.js"
 	import {
 		toOtherPage
@@ -144,7 +229,9 @@
 	 * 数据
 	 */
 	let opacity = ref(0)
-	let isScroll = ref(false)
+	let isScroll = ref(false); // 动态页面开始禁止滑动
+	let isGoodsScroll = ref(false); // 商品页面开始禁止滑动
+	let isExpressScroll = ref(false); // 跑腿页面开始禁止滑动
 	let currentMenu = ref(0) // 菜单
 	const background = computed(() => {
 		return {
@@ -174,11 +261,13 @@
 		},
 		{
 			iconPath: '/static/home/快递.png',
-			text: '快递代取',
+			text: '跑腿服务',
 			active: false
 		}
 	])
 	let articles = ref(null); // 动态集合
+	let goods = ref(null); // 商品集合
+	let express = ref(null); // 跑腿服务
 	let isLoading = ref(false); // 是否开启加载动画
 	let myId = ref(uni.getStorageSync("user").userId); // 我的id
 	let myInfo = ref({
@@ -186,13 +275,32 @@
 		userAvatar: uni.getStorageSync("user").userAvatar,
 		userName: uni.getStorageSync("user").userName
 	})
-	let isRefreshing = ref(false); // 是否开启下拉刷新动画
-	let articleEnabled = ref(true); // 是否允许下拉刷新
+	let isRefreshing = ref(false); // 动态页面是否开启下拉刷新动画
+	let isGoodsRefreshing = ref(false); // 商品页面是否开启下拉刷新动画
+	let isExpressRefreshing = ref(false); // 跑腿页面是否开启下拉刷新动画
+	let articleEnabled = ref(true); // 动态页面是否允许下拉刷新
+	let goodsEnabled = ref(true); // 商品页面是否允许下拉刷新
+	let expressEnabled = ref(true); // 跑图页面是否允许下拉刷新
 
 	onLoad(async (e) => {
 		try {
 			isLoading.value = true
-			articles.value = await getSchoolArticle()
+			// 并发处理
+			const [res1, res2, res3] = await Promise.all([
+				// 获取动态
+				getSchoolArticle(),
+				// 获取商品
+				queryAllGoods(),
+				// 获取跑腿服务
+				queryAllExpress()
+			])
+			articles.value = res1
+			if (res2) {
+				goods.value = res2.filter(item => item.userId !== myId.value)
+			}
+			if (res3) {
+				express.value = res3.filter(item => item.userId !== myId.value)
+			}
 		} catch (err) {
 			console.log(err)
 		} finally {
@@ -252,37 +360,65 @@
 		if (e.detail.scrollTop === 0) {
 			opacity.value = 0
 			isScroll.value = false
+			isGoodsScroll.value = false
+			isExpressScroll.value = false
 			articleEnabled.value = true
+			goodsEnabled.value = true
+			expressEnabled.value = true
 		}
 		if (e.detail.scrollTop > 0 && e.detail.scrollTop < 30) {
 			opacity.value = 0.2
 			isScroll.value = false
-			articleEnabled.value = false;
+			isGoodsScroll.value = false
+			isExpressScroll.value = false
+			articleEnabled.value = false
+			goodsEnabled.value = false
+			expressEnabled.value = false
 		}
 		if (e.detail.scrollTop > 30 && e.detail.scrollTop < 60) {
 			opacity.value = 0.4
 			isScroll.value = false
-			articleEnabled.value = false;
+			isGoodsScroll.value = false
+			isExpressScroll.value = false
+			articleEnabled.value = false
+			goodsEnabled.value = false
+			expressEnabled.value = false
 		}
 		if (e.detail.scrollTop > 60 && e.detail.scrollTop < 90) {
 			opacity.value = 0.6
 			isScroll.value = false
-			articleEnabled.value = false;
+			isGoodsScroll.value = false
+			isExpressScroll.value = false
+			articleEnabled.value = false
+			goodsEnabled.value = false
+			expressEnabled.value = false
 		}
 		if (e.detail.scrollTop > 90 && e.detail.scrollTop < 120) {
 			opacity.value = 0.8
 			isScroll.value = false
-			articleEnabled.value = false;
+			isGoodsScroll.value = false
+			isExpressScroll.value = false
+			articleEnabled.value = false
+			goodsEnabled.value = false
+			expressEnabled.value = false
 		}
 		if (e.detail.scrollTop > 120 && e.detail.scrollTop < 130) {
 			opacity.value = 1
 			isScroll.value = false
-			articleEnabled.value = false;
+			isGoodsScroll.value = false
+			isExpressScroll.value = false
+			articleEnabled.value = false
+			goodsEnabled.value = false
+			expressEnabled.value = false
 		}
 		if (e.detail.scrollTop >= 130) {
 			opacity.value = 1
 			isScroll.value = true
-			articleEnabled.value = false;
+			isGoodsScroll.value = true
+			isExpressScroll.value = true
+			articleEnabled.value = false
+			goodsEnabled.value = false
+			expressEnabled.value = false
 		}
 	}
 
@@ -308,6 +444,54 @@
 
 	const onAbort = () => {
 		isRefreshing.value = false; // 恢复默认状态
+	};
+
+	// 下拉刷新
+	const onRefresh1 = () => {
+		if (goodsEnabled.value) {
+			isGoodsRefreshing.value = true; // 开启刷新状态
+			setTimeout(async () => {
+				try {
+					goods.value = await queryAllGoods()
+				} catch (err) {
+					console.log(err);
+				} finally {
+					isGoodsRefreshing.value = false; // 关闭刷新状态
+				}
+			}, 1000);
+		}
+	};
+
+	const onRestore1 = () => {
+		isGoodsRefreshing.value = false; // 恢复默认状态
+	};
+
+	const onAbort1 = () => {
+		isGoodsRefreshing.value = false; // 恢复默认状态
+	};
+	
+	// 下拉刷新
+	const onRefresh2 = () => {
+		if (expressEnabled.value) {
+			isExpressRefreshing.value = true; // 开启刷新状态
+			setTimeout(async () => {
+				try {
+					express.value = await queryAllExpress()
+				} catch (err) {
+					console.log(err);
+				} finally {
+					isExpressRefreshing.value = false; // 关闭刷新状态
+				}
+			}, 1000);
+		}
+	};
+	
+	const onRestore2 = () => {
+		isExpressRefreshing.value = false; // 恢复默认状态
+	};
+	
+	const onAbort2 = () => {
+		isExpressRefreshing.value = false; // 恢复默认状态
 	};
 
 	uni.$on("updateArticles", (article) => {
@@ -539,6 +723,15 @@
 										display: flex;
 										align-items: center;
 										justify-content: right;
+
+										.price {
+											height: 100%;
+											display: flex;
+											align-items: center;
+											margin-right: 10px;
+											font-size: 20px;
+											color: red;
+										}
 									}
 								}
 							}

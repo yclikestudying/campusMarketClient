@@ -1,9 +1,10 @@
 import {
 	request,
 	requestPromise,
-	singleFile
+	singleFile,
+	uploadFile
 } from "/pages/common/util/request.js"
-// ============================ 点赞模块 =================================
+// ============================================================= 点赞模块 ============================================================= 
 /**
  * @description 取消点赞
  * @param articleId 动态id
@@ -97,7 +98,7 @@ export const isLike = (article, id) => {
 	return false;
 }
 
-// ============================ 动态模块 =================================
+// ============================================================= 动态模块 ============================================================= 
 /**
  * @description 获取关注用户动态
  */
@@ -139,16 +140,16 @@ export const deleteArticleAfter = (articles, articleId) => {
 	return articles.filter(article => article.articleId !== articleId)
 }
 
-// ============================ 搜索模块 =================================
+// ============================================================= 搜索模块 ============================================================= 
 /**
- * @description 搜索用户模块
+ * @description 搜索用户
  * @param content 搜索关键字
  */
 export const searchUser = async (content) => {
 	return await request(`/userInfo/queryLikeUser?keyword=${content}`, "GET", null)
 }
 
-// ============================ 用户模块 =================================
+// ============================================================= 用户模块 ============================================================= 
 /**
  * @description 获取关注数量
  * @param userId 用户id
@@ -252,7 +253,7 @@ export const queryVisit = (userId) => {
 	return requestPromise('/visit/queryVisit', "GET", null)
 }
 
-// ============================ 文件上传模块 =================================
+// ============================================================= 文件上传模块 ============================================================= 
 /**
  * @description 上传单个文件
  * @paam file 文件对象
@@ -261,7 +262,7 @@ export const uploadSingleFile = async (file) => {
 	return await singleFile("/message/uploadImage", file)
 }
 
-// ============================ 聊天记录模块 =================================
+// ============================================================= 聊天记录模块 ============================================================= 
 /**
  * @description 查询聊天记录
  * @paam otherId 单聊对面用户id
@@ -290,4 +291,94 @@ export const queryMessageList = async () => {
  */
 export const queryUnReadMessage = async () => {
 	return await requestPromise(`/message/queryUnReadMessage`, "GET", null)
+}
+
+// ============================================================= 商品模块 ============================================================= 
+/**
+ * @description 商品上传
+ * @param files 图片集合
+ * @param textContent 文本内容
+ * @param price 价格
+ */
+export const uploadGoods = async (files, textContent, price) => {
+	return await uploadFile('/goods/uploadGoods', files, textContent, price)
+}
+
+/**
+ * @description 商品上传
+ * @param textContent 文本内容
+ * @param price 价格
+ */
+export const uploadText = async (textContent, price) => {
+	return await request(`/goods/uploadGoods?text=${textContent}&price=${price}`, "POST", null)
+}
+
+/**
+ * @description 查询商品
+ * @param userId 用户id
+ */
+export const queryGoods = async (userId) => {
+	let url;
+	if (userId) {
+		url = `/goods/queryGoods?userId=${userId}`
+	} else {
+		url = '/goods/queryGoods'
+	}
+	return await requestPromise(url, "GET", null)
+}
+
+/**
+ * @description 查询所有商品
+ * @param userId 用户id
+ */
+export const queryAllGoods = async () => {
+	return await requestPromise(`/goods/queryAllGoods`, "GET", null)
+}
+
+/**
+ * @description 删除商品
+ * @param goodsId 商品id
+ */
+export const deleteByGoodsId = async (goodsId) => {
+	return await request(`/goods/deleteByGoodsId?goodsId=${goodsId}`, "DELETE", null)
+}
+
+// ============================================================= 跑腿服务模块 ============================================================= 
+/**
+ * @description 发布跑腿服务
+ * @param content 跑腿服务内容
+ * @param price 跑腿服务价格
+ */
+export const uploadExpress = async (content, price) => {
+	return await request(`/express/upload`, "POST", {content: content, price: price})
+}
+
+/**
+ * @description 查询所有跑腿服务
+ */
+export const queryAllExpress = async () => {
+	return await requestPromise('/express/queryAllExpress', "GET", null)
+}
+
+/**
+ * @description 查询自己的跑腿服务
+ * @Param userId 用户id
+ */
+export const queryMyExpress = async (userId) => {
+	let url;
+	if (userId) {
+		url = `/express/queryMyExpress?userId=${userId}`
+	} else {
+		url = '/express/queryMyExpress'
+	}
+	
+	return await requestPromise(url, "GET", null)
+}
+
+/**
+ * @description 删除自己的跑腿服务
+ * @Param expressId 跑腿服务id
+ */
+export const deleteExpressById = async (expressId) => {
+	return await request(`/express/deleteExpress?expressId=${expressId}`, "DELETE", null)
 }

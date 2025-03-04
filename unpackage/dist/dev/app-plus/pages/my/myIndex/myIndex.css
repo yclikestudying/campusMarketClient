@@ -754,6 +754,14 @@
   align-items: center;
   justify-content: right;
 }
+.myIndex .content .detail .swiper uni-swiper-item .swiper-item .page .article .function .price[data-v-fc8ca2d6] {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  font-size: 20px;
+  color: red;
+}
 .active-underline[data-v-fc8ca2d6] {
   background-color: #FEE802 !important;
 }

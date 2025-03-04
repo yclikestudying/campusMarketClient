@@ -21,10 +21,22 @@
 						<scroll-view scroll-y="true" class="userList">
 							<van-empty v-if="messageList === null" description="这里空空如也" />
 							<template v-for="(message, index) in messageList" :key="message.userId">
-								<uni-list-chat :title="message.userName" clickable
+								<uni-list-chat v-if="message.type === 'text'" :title="message.userName" clickable
 									@click="toOtherPage('chat', 'me', 'update', {userId:message.userId, userAvatar:message.userAvatar, userName:message.userName})"
 									:avatar="message.userAvatar"
-									:note="message.userId === message.sendUserId ? message.type === 'text' ? message.content : '[图片]' :  message.type === 'text' ? `我:${message.content}` : `我:[图片]`"
+									:note="message.userId === message.sendUserId ? message.content : `我:${message.content}`"
+									:time="relativeTime(message.createTime, 'other')"
+									:badge-text="message.unReadMessageCount"></uni-list-chat>
+								<uni-list-chat v-else-if="message.type === 'image'" :title="message.userName" clickable
+									@click="toOtherPage('chat', 'me', 'update', {userId:message.userId, userAvatar:message.userAvatar, userName:message.userName})"
+									:avatar="message.userAvatar"
+									:note="message.userId === message.sendUserId ? '[图片]' : '我:[图片]'"
+									:time="relativeTime(message.createTime, 'other')"
+									:badge-text="message.unReadMessageCount"></uni-list-chat>
+								<uni-list-chat v-else :title="message.userName" clickable
+									@click="toOtherPage('chat', 'me', 'update', {userId:message.userId, userAvatar:message.userAvatar, userName:message.userName})"
+									:avatar="message.userAvatar"
+									:note="message.userId === message.sendUserId ? '[链接]' : '我:[链接]'" 
 									:time="relativeTime(message.createTime, 'other')"
 									:badge-text="message.unReadMessageCount"></uni-list-chat>
 							</template>
@@ -58,16 +70,28 @@
 		onLoad
 	} from "@dcloudio/uni-app"
 	import {
-		queryMessageList
+		queryMessageList,
+		queryUnReadMessage
 	} from "/pages/common/util/api.js"
 
 	// 数据
 	let currentOption = ref(0)
 	let messageList = ref([]); // 消息列表
-	
+
 
 	onShow(async () => {
 		messageList.value = await queryMessageList()
+		const count = await queryUnReadMessage()
+		if (count !== 0) {
+			uni.setTabBarBadge({
+				index: 2,
+				text: `${count}`
+			})
+		} else {
+			uni.removeTabBarBadge({
+				index: 2
+			})
+		}
 	})
 
 	// 设置新的currentOption
