@@ -20216,7 +20216,7 @@ ${o3}
         }
         app.globalData.sockets = sockets;
       });
-      uni.$on("websocketMessage", (message) => {
+      uni.$on("websocketMessage", async (message) => {
         const data = JSON.parse(message);
         if (uni.getStorageSync("user").userId === data.sendUserId) {
           uni.$emit("updateMessage");
@@ -20225,6 +20225,7 @@ ${o3}
           if (socket.getIsConnected()) {
             if (socket.getOneByOne() === data.sendUserId) {
               uni.$emit("updateMessage");
+              await read$1(data.sendUserId);
             }
           }
         }
@@ -20233,6 +20234,8 @@ ${o3}
         return WebSocketClient;
       }, get onLaunch() {
         return onLaunch;
+      }, get read() {
+        return read$1;
       } };
       Object.defineProperty(__returned__, "__isScriptSetup", { enumerable: false, value: true });
       return __returned__;

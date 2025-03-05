@@ -1,6 +1,9 @@
 <script setup>
 	import Socket from "/pages/common/util/socket.js"
 	import { onLaunch } from '@dcloudio/uni-app';
+	import {
+		read
+	} from "/pages/common/util/api.js"
 	
 	const sockets = {}; // 用来存储所有用户的socket实例
 	
@@ -13,7 +16,7 @@
 	  app.globalData.sockets = sockets;
 	});
 	
-	uni.$on('websocketMessage', (message) => {
+	uni.$on('websocketMessage', async (message) => {
 		const data = JSON.parse(message)
 		// 判断当前用户是不是发送者
 		if (uni.getStorageSync("user").userId === data.sendUserId) {
@@ -26,6 +29,8 @@
 				// 连接服务器，那么判断当前用户是否在与发送者的聊天页面
 				if (socket.getOneByOne() === data.sendUserId) {
 					uni.$emit("updateMessage")
+					// 清空未读消息
+					await read(data.sendUserId)
 				}
 			}
 			// 没有连接服务器就算了
